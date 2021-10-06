@@ -25,19 +25,19 @@ class ColorMoments:
                 mean = np.mean(window)
                 std = np.std(window)
                 skewness = skew(window.flatten())
-                feature.append([mean, std, skewness])
+                feature.extend([mean, std, skewness])
         return np.array(feature)
 
-    # Computes and visualizes feature vectors for a given image
-    def visualize_feature(self, image):
-        height, width = image.shape[0], image.shape[1]
-        features = self.compute_features(image)
-        index = 0
-        for y in range(0, height, self.windowY):
-            for x in range(0, width, self.windowX):
-                print(features[index], end=" ")
-                index += 1
-            print()
+    # # Computes and visualizes feature vectors for a given image
+    # def visualize_feature(self, image):
+    #     height, width = image.shape[0], image.shape[1]
+    #     features = self.compute_features(image)
+    #     index = 0
+    #     for y in range(0, height, self.windowY):
+    #         for x in range(0, width, self.windowX):
+    #             print(features[index], end=" ")
+    #             index += 1
+    #         print()
 
     # Computes feature vectors for all image matrices provided
     def compute_features_for_images(self, images):
@@ -55,38 +55,34 @@ class ColorMoments:
     # Calculates similarity score between feature vector of two images by first computing 
     # individual intersection similarities between color moments and then taking a L2 norm
     def computeL2Similarity(self, feature1, feature2):
-        n = len(feature1)
-        similarities = np.zeros(n)
-        for x in range(n):
-            similarities[x] = self.computeIntersectionSimilarity(
-                feature1[x], feature2[x])
-        return np.linalg.norm(similarities)
+        
+        return np.sum(np.absolute(feature1-feature2));
 
     # Calculates similarity scores between the query image and every other image
-    def computeL2Similarities(self, features, index):
-        n = len(features)
-        query_image = features[index]
-        similarities = np.zeros(n)
-        for x in range(n):
-            similarities[x] = self.computeL2Similarity(query_image,
-                                                       features[x])
-        return similarities
+    # def computeL2Similarities(self, features, index):
+    #     n = len(features)
+    #     query_image = features[index]
+    #     similarities = np.zeros(n)
+    #     for x in range(n):
+    #         similarities[x] = self.computeL2Similarity(query_image,
+    #                                                    features[x])
+    #     return similarities
 
-    def getIndex(self, labels, file_id):
-        return labels.tolist().index(file_id)
+    # def getIndex(self, labels, file_id):
+    #     return labels.tolist().index(file_id)
 
     # Calculates normalized similarity scores between the query image and every other image
-    def get_normalized_similarities(self, labels, features, file_id):
-        similarities = self.computeL2Similarities(
-            features, self.getIndex(labels, file_id))
-        return similarities / np.sum(similarities)
+    # def get_normalized_similarities(self, labels, features, file_id):
+    #     similarities = self.computeL2Similarities(
+    #         features, self.getIndex(labels, file_id))
+    #     return similarities / np.sum(similarities)
 
     # Retrieves k most similar images from the given features based on the computed similarity scores
-    def get_top_k(self, labels, features, file_id, k):
-        similarities = self.computeL2Similarities(
-            features, self.getIndex(labels, file_id))
-        ans = np.flipud(np.argsort(similarities)[-k-1:])
-        return [(labels[x], similarities[x]) for x in ans]
+    # def get_top_k(self, labels, features, file_id, k):
+    #     similarities = self.computeL2Similarities(
+    #         features, self.getIndex(labels, file_id))
+    #     ans = np.flipud(np.argsort(similarities)[-k-1:])
+    #     return [(labels[x], similarities[x]) for x in ans]
 
     # Following code are some other distance functions and configurations tested out
 
