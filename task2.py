@@ -1,6 +1,8 @@
 import imageLoader
 import modelFactory
 import argparse
+import numpy as np
+
 
 from tech.SVD import SVD
 

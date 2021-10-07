@@ -3,6 +3,7 @@ import modelFactory
 import argparse
 import json
 import os
+import numpy as np
 
 from tech.SVD import SVD
 
