@@ -1,7 +1,8 @@
 import imageLoader
 import modelFactory
 import argparse
-import numpy as np
+import json
+import os
 
 from tech.SVD import SVD
 
@@ -74,7 +75,6 @@ def print_semantics(labels, metrics):
             print(subjects[x]+"="+str(semantic_weights[x]), end=" ")
         print()
 
-
 data = imageLoader.load_images_from_folder(args.folder_path,args.X,'*')
 if data is not None:
     model = modelFactory.get_model(args.feature_model)
@@ -85,9 +85,17 @@ if data is not None:
         args.tech
     elif(args.tech=='svd'):
         svd = SVD(model,args.k)
-        latent_data = svd.compute_semantics_type(images,labels)
+        latent_data = [labels, svd.compute_semantics_type(images)]
+        json_feature_descriptors = json.dumps(latent_data, indent=4)
+        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
+        file_path = os.path.join(args.folder_path, file_name)
+        if os.path.isfile(file_path):
+                os.remove(file_path)
+        with open(file_path, "w") as out_file:
+            out_file.write(json_feature_descriptors)
         print("done.")
     elif(args.tech=='lda'):
         args.tech
     else:
         args.tech
+

@@ -1,11 +1,12 @@
 import imageLoader
 import modelFactory
 import argparse
-import numpy as np
 
-parser = argparse.ArgumentParser(description="Task 2")
+from tech.SVD import SVD
+
+parser = argparse.ArgumentParser(description="Task 1")
 parser.add_argument(
-    "-f",
+    "-fp",
     "--folder_path",
     type=str,
     required=True,
@@ -17,8 +18,8 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "-x",
-    "--X",
+    "-y",
+    "--Y",
     type=str,
     required=True,
 )
@@ -72,7 +73,7 @@ def print_semantics(labels, metrics):
             print(subjects[x]+"="+str(semantic_weights[x]), end=" ")
         print()
 
-data = imageLoader.load_images_from_folder(args.folder_path,args.X,'*')
+data = imageLoader.load_images_from_folder(args.folder_path,'*',args.Y)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)
     images = data[1]
@@ -82,9 +83,10 @@ if data is not None:
         args.tech
     elif(args.tech=='svd'):
         svd = SVD(model,args.k)
-        latent_data = svd.compute_semantics_type(images,labels)
+        latent_data = svd.compute_semantics_type(images)
         print("done.")
     elif(args.tech=='lda'):
         args.tech
     else:
         args.tech
+
