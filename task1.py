@@ -1,6 +1,7 @@
 import imageLoader
 import modelFactory
 import argparse
+import numpy as np
 
 from tech.SVD import SVD
 
@@ -38,6 +39,42 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+def extract_subject_weight_pairs(labels, metrics):
+  subject_metrics = {}
+  for x in range(len(labels)):
+    subject = labels[x].split("-")[2]
+    subject_data = []
+    if subject in subject_metrics:
+      subject_data = subject_metrics[subject]
+    subject_data.append(metrics[x])
+    subject_metrics[subject] = subject_data
+  y = metrics.shape[1]
+  subject_weights = []
+  subjects = []
+  index = 0
+  for sub, data in subject_metrics.items():
+    subjects.append(sub)
+    count = 0
+    subject_weight = np.zeros(y)
+    for d in data:
+      subject_weight += d
+      count += 1
+    subject_weights.append(subject_weight/count)
+    index += 1
+  return [subjects, subject_weights]
+
+def print_semantics(labels, metrics):
+    subjects, subject_weights = extract_subject_weight_pairs(labels, metrics)
+    subject_weights = np.array(subject_weights)
+    for x in range(subject_weights.shape[1]):
+        print("latent semantic "+str(x)+":", end=" ")
+        semantic_weights = subject_weights[:,x:x+1].flatten()
+        sorted_order = np.flip(np.argsort(semantic_weights))
+        for x in sorted_order:
+            print(subjects[x]+"="+str(semantic_weights[x]), end=" ")
+        print()
+
+
 data = imageLoader.load_images_from_folder(args.folder_path,args.X,'*')
 if data is not None:
     model = modelFactory.get_model(args.feature_model)
@@ -54,4 +91,3 @@ if data is not None:
         args.tech
     else:
         args.tech
-
