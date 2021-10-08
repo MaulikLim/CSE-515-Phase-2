@@ -4,7 +4,7 @@ import os
 import json
 
 # Saves the feature descriptors to a json file
-def save_features_to_json(folder_path, feature_descriptors, file_name='feature_descriptors.json'):
+def save_features_to_json(folder_path, feature_descriptors, file_name):
     json_feature_descriptors = json.dumps(feature_descriptors, indent=4)
     file_path = os.path.join(folder_path, file_name)
     if os.path.isfile(file_path):

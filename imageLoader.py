@@ -52,7 +52,7 @@ def load_images_from_folder(path,image_type,subject):
 def generate_regex(image_type, subject):
   reg = "image-"
   if(image_type == "*"):
-    reg += "[a-z]*-"
+    reg += "[a-z]*[0-9]*-"
   else:
     reg += image_type+"-"
   

@@ -1,62 +1,83 @@
-import imageLoader, modelFactory, featureLoader
+from featureGenerator import save_features_to_json
+import imageLoader
+import modelFactory
 import argparse
-import featureGenerator
+import json
 import os
+import numpy as np
+import datetime
+from tech.SVD import SVD
+from utilities import print_semantics_type
 
 parser = argparse.ArgumentParser(description="Task 3")
 parser.add_argument(
-    "-f",
+    "-fp",
     "--folder_path",
     type=str,
     required=True,
 )
 parser.add_argument(
-    "-i",
-    "--image_id",
+    "-f",
+    "--feature_model",
     type=str,
     required=True,
 )
-parser.add_argument(
-    "-m",
-    "--model",
-    type=str,
-    required=True,
-)
+
 parser.add_argument(
     "-k",
     "--k",
     type=int,
     required=True,
 )
-
-
+parser.add_argument(
+    "-t",
+    "--tech",
+    type=str,
+    required=True,
+)
 args = parser.parse_args()
-folder_path = os.path.join(os.getcwd(), args.folder_path)
-# loads labels and feature vectors for the given folder path and model name
-labels, features = featureLoader.load_features_for_model(folder_path, args.model)
 
-# if no features found, it generates new features
-if features is None or len(features) == 0:
-    print("No feature descriptors found. Generating new ones")
-    labels, images = imageLoader.load_images_from_folder(args.folder_path)
-    featureGenerator.generate_and_save_features(labels, images, args.folder_path)
-    labels, features = featureLoader.load_features_for_model(folder_path, args.model)
+def create_type_type(features, labels):
+    res = []
+    labs = []
+    for i in range(len(labels)):
+        lab = labels[i].split("-")[1]
+        if lab not in labs:
+            labs.append(lab)
+            res.append(features[i])
+        else:
+            ind = labs.index(lab)
+            res[ind] = np.mean( np.array([ res[ind], features[i] ]), axis=0 )
+    return [labs,res]
+data = imageLoader.load_images_from_folder(args.folder_path)
+if data is not None:
+    model = modelFactory.get_model(args.feature_model)        
+    images = data[1]
+    labels = data[0]
+    features = model.compute_features_for_images(images)
+    type_mat = create_type_type(features,labels)
+    labels = type_mat[0]
+    type_mat = type_mat[1]
+    if(args.tech=='pca'):
+        #PCA
+        args.tech
+    elif(args.tech=='svd'):
+        svd = SVD(args.k)
+        latent_data = [labels, svd.compute_semantics(type_mat)]
+        print_semantics_type(labels,np.matmul(np.array(latent_data[0]),np.array(latent_data[1])))
+        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_type_"+str(args.k)+".json"
+        save_features_to_json(args.folder_path,latent_data,file_name)
+        # print_semantics(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
+        # json_feature_descriptors = json.dumps(latent_data, indent=4)
+        # file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
+        # file_path = os.path.join(args.folder_path, file_name)
+        # if os.path.isfile(file_path):
+        #         os.remove(file_path)
+        # with open(file_path, "w") as out_file:
+        #     out_file.write(json_feature_descriptors)
+        print("done.")
+    elif(args.tech=='lda'):
+        args.tech
+    else:
+        args.tech
 
-# retrieves top k similar images for the given model, prints their similarity score and visualizes them
-model = modelFactory.get_model(args.model)
-ans = model.get_top_k(labels, features, args.image_id, args.k)
-for x in ans:
-    print(x)
-    image_path = os.path.join(folder_path, x[0])
-    imageLoader.show_image(image_path)
-
-# acc = 0
-# for name in labels:
-#     result = model.get_top_k(labels, features, name, args.k)
-#     match = 0
-#     for label, score in result:
-# #             print(img);
-#         if(label.split("_")[0]==name.split("_")[0]):
-#             match += 1
-#     acc += (match/args.k)
-# print(acc)

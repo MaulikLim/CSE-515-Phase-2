@@ -3,14 +3,11 @@ import numpy as np
 
 class SVD:
 
-    def __init__(self, model, k):
+    def __init__(self, k):
         self.name = "svd"
-        self.model = model
         self.k = k
 
-    def compute_semantics_type(self, images):
-        print(np.array(images).shape)
-        data = self.model.compute_features_for_images(images)
+    def compute_semantics(self, data):
         data_t = data.transpose()
         l = np.matmul(data,data_t)
         r = np.matmul(data_t,data)

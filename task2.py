@@ -1,10 +1,13 @@
+from featureGenerator import save_features_to_json
 import imageLoader
 import modelFactory
 import argparse
+import numpy as np
 
 from tech.SVD import SVD
+from utilities import extract_type_weight_pairs, print_semantics_type
 
-parser = argparse.ArgumentParser(description="Task 1")
+parser = argparse.ArgumentParser(description="Task 2")
 parser.add_argument(
     "-fp",
     "--folder_path",
@@ -38,53 +41,21 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-def extract_type_weight_pairs(labels, metrics):
-  type_metrics = {}
-  for x in range(len(labels)):
-    image_type = labels[x].split("-")[1]
-    type_data = []
-    if image_type in type_metrics:
-      type_data = type_metrics[image_type]
-    type_data.append(metrics[x])
-    type_metrics[image_type] = type_data
-  y = metrics.shape[1]
-  type_weights = []
-  types = []
-  index = 0
-  for image_type, data in type_metrics.items():
-    types.append(image_type)
-    count = 0
-    type_weight = np.zeros(y)
-    for d in data:
-      type_weight += d
-      count += 1
-    type_weights.append(type_weight/count)
-    index += 1
-  return [types, type_weights]
-
-def print_semantics(labels, metrics):
-    subjects, subject_weights = extract_type_weight_pairs(labels, metrics)
-    subject_weights = np.array(subject_weights)
-    for x in range(subject_weights.shape[1]):
-        print("latent semantic "+str(x)+":", end=" ")
-        semantic_weights = subject_weights[:,x:x+1].flatten()
-        sorted_order = np.flip(np.argsort(semantic_weights))
-        for x in sorted_order:
-            print(subjects[x]+"="+str(semantic_weights[x]), end=" ")
-        print()
-
 data = imageLoader.load_images_from_folder(args.folder_path,'*',args.Y)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)
     images = data[1]
     labels = data[0]
+    features = model.compute_features_for_images(images)
     if(args.tech=='pca'):
         #PCA
         args.tech
     elif(args.tech=='svd'):
-        svd = SVD(model,args.k)
-        latent_data = svd.compute_semantics_type(images)
-        print("done.")
+        svd = SVD(args.k)
+        latent_data = svd.compute_semantics(features)
+        print_semantics_type(labels,np.matmul(np.array(latent_data[0]),np.array(latent_data[1])))
+        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.Y+"_"+str(args.k)+".json"
+        save_features_to_json(args.folder_path,latent_data,file_name)
     elif(args.tech=='lda'):
         args.tech
     else:
