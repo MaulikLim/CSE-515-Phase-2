@@ -32,7 +32,7 @@ def load_images_from_folder(path):
             images.append(img)
     return [labels, images]
 
-def load_images_from_folder(path,image_type,subject):
+def load_spec_images_from_folder(path,image_type,subject):
     images = []
     labels = []
     folder_path = os.path.join(os.getcwd(), path)

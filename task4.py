@@ -40,15 +40,17 @@ args = parser.parse_args()
 def create_sub_sub(features, labels):
     res = []
     labs = []
+    res_labs = []
     for i in range(len(labels)):
         lab = labels[i].split("-")[2]
         if lab not in labs:
             labs.append(lab)
+            res_labs.append(labels[i])
             res.append(features[i])
         else:
             ind = labs.index(lab)
             res[ind] = np.mean( np.array([ res[ind], features[i] ]), axis=0 )
-    return [labs,res]
+    return [res_labs,res]
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)        
@@ -64,7 +66,7 @@ if data is not None:
     elif(args.tech=='svd'):
         svd = SVD(args.k)
         latent_data = [labels, svd.compute_semantics(sub_mat)]
-        print_semantics_sub(labels,np.matmul(np.array(latent_data[0]),np.array(latent_data[1])))
+        print_semantics_sub(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
         file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_subject_"+str(args.k)+".json"
         save_features_to_json(args.folder_path,latent_data,file_name)
         # print_semantics(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))

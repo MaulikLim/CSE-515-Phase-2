@@ -41,7 +41,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-data = imageLoader.load_images_from_folder(args.folder_path,'*',args.Y)
+data = imageLoader.load_spec_images_from_folder(args.folder_path,'*',args.Y)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)
     images = data[1]
@@ -52,8 +52,8 @@ if data is not None:
         args.tech
     elif(args.tech=='svd'):
         svd = SVD(args.k)
-        latent_data = svd.compute_semantics(features)
-        print_semantics_type(labels,np.matmul(np.array(latent_data[0]),np.array(latent_data[1])))
+        latent_data = [labels,svd.compute_semantics(features)]
+        print_semantics_type(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
         file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.Y+"_"+str(args.k)+".json"
         save_features_to_json(args.folder_path,latent_data,file_name)
     elif(args.tech=='lda'):

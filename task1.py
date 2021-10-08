@@ -43,7 +43,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-data = imageLoader.load_images_from_folder(args.folder_path,args.X,'*')
+data = imageLoader.load_spec_images_from_folder(args.folder_path,args.X,'*')
 if data is not None:
     model = modelFactory.get_model(args.feature_model)        
     images = data[1]

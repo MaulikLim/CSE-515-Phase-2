@@ -8,6 +8,7 @@ class SVD:
         self.k = k
 
     def compute_semantics(self, data):
+        data = np.array(data)
         data_t = data.transpose()
         l = np.matmul(data,data_t)
         r = np.matmul(data_t,data)
