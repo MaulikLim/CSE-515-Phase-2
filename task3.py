@@ -51,6 +51,7 @@ def create_type_type(features, labels):
             ind = labs.index(lab)
             res[ind] = np.mean( np.array([ res[ind], features[i] ]), axis=0 )
     return [res_labs,res]
+
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)        
