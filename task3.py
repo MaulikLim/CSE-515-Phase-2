@@ -50,6 +50,8 @@ def create_type_type(features, labels):
         else:
             ind = labs.index(lab)
             res[ind] = np.mean( np.array([ res[ind], features[i] ]), axis=0 )
+    res = np.array(res)
+    res = np.matmul(res,res.transpose())
     return [res_labs,res]
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
