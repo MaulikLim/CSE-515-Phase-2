@@ -1,4 +1,5 @@
 import numpy as np
+
 def extract_type_weight_pairs(labels, metrics):
   type_metrics = {}
   for x in range(len(labels)):
@@ -33,8 +34,6 @@ def print_semantics_type(labels, metrics):
         for x in sorted_order:
             print(subjects[x]+"="+str(semantic_weights[x]), end=" ")
         print()
-
-
 
 def extract_subject_weight_pairs(labels, metrics):
   subject_metrics = {}
