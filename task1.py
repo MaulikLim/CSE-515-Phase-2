@@ -3,11 +3,12 @@ import imageLoader
 import modelFactory
 import argparse
 import json
-import os
 import numpy as np
 
 from tech.SVD import SVD
-from utilities import print_semantics_sub
+from tech.LDA import LDA
+import tech.LDAHelper as lda_helper
+from utilities import print_semantics_sub, print_semantics_type
 
 parser = argparse.ArgumentParser(description="Task 1")
 parser.add_argument(
@@ -49,6 +50,7 @@ if data is not None:
     images = data[1]
     labels = data[0]
     data = model.compute_features_for_images(images)
+    print(data.shape)
     if(args.tech=='pca'):
         #PCA
         args.tech
@@ -59,7 +61,13 @@ if data is not None:
         file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
         save_features_to_json(args.folder_path,latent_data,file_name)
     elif(args.tech=='lda'):
-        args.tech
+        lda = LDA(k=args.k)
+        lda.compute_semantics(lda_helper.transform_cm_for_lda(data))
+        latent_data = lda.transform_data(data)
+        print_semantics_sub(labels, latent_data)
+        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
+        lda.save_model(file_name)
+        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
     else:
         args.tech
 
