@@ -69,3 +69,6 @@ def print_semantics_sub(labels, metrics):
         for x in sorted_order:
             print(subjects[x]+"="+str(semantic_weights[x]), end=" ")
         print()
+
+def intersection_similarity_between_features(f1,f2):
+    return np.sum(np.minimum(f1,f2))/np.sum(np.maximum(f1,f2))
