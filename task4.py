@@ -7,6 +7,7 @@ import os
 import numpy as np
 import datetime
 from tech.SVD import SVD
+from tech.LDA import LDA
 from utilities import print_semantics_sub
 
 parser = argparse.ArgumentParser(description="Task 3")
@@ -53,6 +54,7 @@ def create_sub_sub(features, labels):
     res = np.array(res)
     res = np.matmul(res,res.transpose())
     return [res_labs,res]
+
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)        
@@ -81,7 +83,13 @@ if data is not None:
         #     out_file.write(json_feature_descriptors)
         print("done.")
     elif(args.tech=='lda'):
-        args.tech
+        lda = LDA(k=args.k)
+        lda.compute_semantics(sub_mat)
+        latent_data = lda.transform_data(sub_mat)
+        print_semantics_sub(labels, latent_data)
+        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_subject_"+str(args.k)
+        lda.save_model(file_name)
+        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
     else:
         args.tech
 

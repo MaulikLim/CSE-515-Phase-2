@@ -7,6 +7,7 @@ import os
 import numpy as np
 import datetime
 from tech.SVD import SVD
+from tech.LDA import LDA
 from utilities import print_semantics_type
 
 parser = argparse.ArgumentParser(description="Task 3")
@@ -63,6 +64,7 @@ if data is not None:
     type_mat = create_type_type(features,labels)
     labels = type_mat[0]
     type_mat = type_mat[1]
+    print(type_mat.shape)
     if(args.tech=='pca'):
         #PCA
         args.tech
@@ -82,7 +84,13 @@ if data is not None:
         #     out_file.write(json_feature_descriptors)
         print("done.")
     elif(args.tech=='lda'):
-        args.tech
+        lda = LDA(k=args.k)
+        lda.compute_semantics(type_mat)
+        latent_data = lda.transform_data(type_mat)
+        print_semantics_type(labels, latent_data)
+        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_type_"+str(args.k)+".json"
+        lda.save_model(file_name)
+        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
     else:
         args.tech
 
