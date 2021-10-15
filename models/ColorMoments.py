@@ -56,7 +56,7 @@ class ColorMoments:
     # individual intersection similarities between color moments and then taking a L2 norm
     def computeL2Similarity(self, feature1, feature2):
         
-        return np.sum(np.absolute(feature1-feature2));
+        return np.sum(np.absolute(feature1-feature2))
 
     # Calculates similarity scores between the query image and every other image
     # def computeL2Similarities(self, features, index):
