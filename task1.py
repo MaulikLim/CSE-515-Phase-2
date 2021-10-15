@@ -51,6 +51,7 @@ if data is not None:
     labels = data[0]
     data = model.compute_features_for_images(images)
     print(data.shape)
+    file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
     if(args.tech=='pca'):
         #PCA
         args.tech
@@ -58,14 +59,12 @@ if data is not None:
         svd = SVD(args.k)
         latent_data = [labels, svd.compute_semantics(data)]
         print_semantics_sub(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
-        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
         save_features_to_json(args.folder_path,latent_data,file_name)
     elif(args.tech=='lda'):
         lda = LDA(k=args.k)
         lda.compute_semantics(lda_helper.transform_cm_for_lda(data))
         latent_data = lda.transform_data(data)
         print_semantics_sub(labels, latent_data)
-        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
         lda.save_model(file_name)
         save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
     else:

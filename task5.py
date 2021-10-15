@@ -52,7 +52,7 @@ if data is not None:
         args.tech
     elif(tech=='svd'):
         labels = data[0]
-        r_mat = np.array(l_features[1][1]).transpose()
+        r_mat = np.array(l_features[1][2]).transpose()
         new_data = []
         for d in data[1]:
             feature_mat = model.compute_features(d)
@@ -62,12 +62,13 @@ if data is not None:
         l_q_feature_mat = np.matmul(q_feature_mat,r_mat)
         result = []
         for ind,d in enumerate(new_data):
-            sim_score = intersection_similarity_between_features(d,l_q_feature_mat)
+            sim_score = np.sum(np.abs(d-l_q_feature_mat))
             result.append([labels[ind],sim_score])
-        result = sorted(result, key=lambda x: x[1], reverse=True)[:args.k]
-
-        for ind, ele in result:
-            print(ind, "Similarity score::",ele[1])
+        result = sorted(result, key=lambda x: x[1])[:args.k]
+        i=0
+        for ele in result:
+            i+=1
+            print(i,ele[0], "Similarity score::",ele[1])
             imageLoader.show_image(os.path.join(args.folder_path,ele[0]))
     elif(tech=='lda'):
         args.tech
