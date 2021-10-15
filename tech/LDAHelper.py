@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def transform_cm_for_lda(data):
     data = data.reshape([data.shape[0], 64, 3])
     print(data.shape)

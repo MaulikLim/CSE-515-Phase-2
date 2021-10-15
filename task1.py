@@ -7,6 +7,7 @@ import numpy as np
 
 from tech.SVD import SVD
 from tech.LDA import LDA
+from tech.KMeans import KMeans
 import tech.LDAHelper as lda_helper
 from utilities import print_semantics_sub, print_semantics_type
 
@@ -44,30 +45,37 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-data = imageLoader.load_spec_images_from_folder(args.folder_path,args.X,'*')
+data = imageLoader.load_spec_images_from_folder(args.folder_path, args.X, '*')
 if data is not None:
-    model = modelFactory.get_model(args.feature_model)        
+    model = modelFactory.get_model(args.feature_model)
     images = data[1]
     labels = data[0]
     data = model.compute_features_for_images(images)
     print(data.shape)
-    if(args.tech=='pca'):
-        #PCA
+    if args.tech == 'pca':
+        # PCA
         args.tech
-    elif(args.tech=='svd'):
+    elif args.tech == 'svd':
         svd = SVD(args.k)
         latent_data = [labels, svd.compute_semantics(data)]
-        print_semantics_sub(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
-        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
-        save_features_to_json(args.folder_path,latent_data,file_name)
-    elif(args.tech=='lda'):
-        lda = LDA(k=args.k)
+        print_semantics_sub(labels, np.matmul(np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(
+            args.k) + ".json"
+        save_features_to_json(args.folder_path, latent_data, file_name)
+    elif args.tech == 'lda':
+        lda = LDA(args.k)
         lda.compute_semantics(lda_helper.transform_cm_for_lda(data))
         latent_data = lda.transform_data(data)
         print_semantics_sub(labels, latent_data)
-        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
+        file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(
+            args.k) + ".json"
         lda.save_model(file_name)
         save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
     else:
-        args.tech
-
+        kmeans = KMeans(args.k)
+        kmeans.compute_semantics(data)
+        latent_data = kmeans.transform_data(data)
+        file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(
+            args.k) + ".json"
+        kmeans.save_model(file_name)
+        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
