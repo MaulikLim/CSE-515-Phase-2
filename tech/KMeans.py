@@ -101,7 +101,7 @@ class KMeans:
                 self.obj_fun_val += np.sum(np.array((self.clusters[key]) - self.centroids[key]) ** 2)
 
     def compute_semantics(self, data):
-        self.initialize_centers(data, init_strategy=2)
+        self.initialize_centers(data, init_strategy=1)
         self.cluster(data)
 
     def transform_data(self, data, *args, **kwargs):

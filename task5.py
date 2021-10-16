@@ -47,11 +47,10 @@ if data is not None:
     tech = info[3]
     type = info[4]
     l_k = info[5]
-    if(tech=='pca'):
-        #PCA
-        pass
-    elif(tech=='svd'):
-
+    if tech == 'pca':
+        # PCA
+        args.tech
+    elif tech == 'svd':
         labels = data[0]
         r_mat = np.array(l_features[1][2]).transpose()
         if type=='type' or type=='subject':
@@ -81,4 +80,3 @@ if data is not None:
         pass
     else:
         pass
-
