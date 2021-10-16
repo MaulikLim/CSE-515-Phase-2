@@ -72,7 +72,5 @@ if data is not None:
         kmeans = KMeans(args.k)
         kmeans.compute_semantics(data)
         latent_data = kmeans.transform_data(data)
-        file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(
-            args.k) + ".json"
         kmeans.save_model(file_name)
         save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)

@@ -37,7 +37,4 @@ class SVD:
             else:
                 break
         eig_mat = np.sqrt(np.diag(np.array(eig_mat)))
-        print(np.array(l_eig_vectors).shape)
-        # print(sorted_r_indices)
-        print(np.array(r_eig[1]).shape)
         return [np.array(l_eig_vectors).transpose().tolist(), eig_mat.tolist(), r_eig_vectors]

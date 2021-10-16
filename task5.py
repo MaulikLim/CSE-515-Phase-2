@@ -49,16 +49,23 @@ if data is not None:
     l_k = info[5]
     if(tech=='pca'):
         #PCA
-        args.tech
+        pass
     elif(tech=='svd'):
+
         labels = data[0]
         r_mat = np.array(l_features[1][2]).transpose()
+        if type=='type' or type=='subject':
+            feature_type_mat = np.array(l_features[3])
         new_data = []
         for d in data[1]:
             feature_mat = model.compute_features(d)
+            if type=='type' or type=='subject':
+                feature_mat = np.matmul(feature_mat,feature_type_mat.T)
             l_feature_mat = np.matmul(feature_mat,r_mat)
             new_data.append(l_feature_mat)
         q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
+        if type=='type' or type=='subject':
+            q_feature_mat = np.matmul(q_feature_mat,feature_type_mat.T)
         l_q_feature_mat = np.matmul(q_feature_mat,r_mat)
         result = []
         for ind,d in enumerate(new_data):
@@ -71,7 +78,7 @@ if data is not None:
             print(i,ele[0], "Similarity score::",ele[1])
             imageLoader.show_image(os.path.join(args.folder_path,ele[0]))
     elif(tech=='lda'):
-        args.tech
+        pass
     else:
-        args.tech
+        pass
 

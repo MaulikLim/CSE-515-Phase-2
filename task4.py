@@ -52,8 +52,8 @@ def create_sub_sub(features, labels):
             ind = labs.index(lab)
             res[ind] = np.mean( np.array([ res[ind], features[i] ]), axis=0 )
     res = np.array(res)
-    res = np.matmul(res,res.transpose())
-    return [res_labs,res]
+    ans = np.matmul(res,res.transpose())
+    return [res_labs,ans,res]
 
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
@@ -63,25 +63,17 @@ if data is not None:
     features = model.compute_features_for_images(images)
     sub_mat = create_sub_sub(features,labels)
     labels = sub_mat[0]
+    feature_sub_mat = sub_mat[2]
     sub_mat = sub_mat[1]
     if(args.tech=='pca'):
         #PCA
         args.tech
     elif(args.tech=='svd'):
         svd = SVD(args.k)
-        latent_data = [labels, svd.compute_semantics(sub_mat)]
+        latent_data = [labels, svd.compute_semantics(sub_mat), sub_mat.tolist(), feature_sub_mat.tolist()]
         print_semantics_sub(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
         file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_subject_"+str(args.k)+".json"
         save_features_to_json(args.folder_path,latent_data,file_name)
-        # print_semantics(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
-        # json_feature_descriptors = json.dumps(latent_data, indent=4)
-        # file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_"+args.X+"_"+str(args.k)+".json"
-        # file_path = os.path.join(args.folder_path, file_name)
-        # if os.path.isfile(file_path):
-        #         os.remove(file_path)
-        # with open(file_path, "w") as out_file:
-        #     out_file.write(json_feature_descriptors)
-        print("done.")
     elif(args.tech=='lda'):
         lda = LDA(k=args.k)
         lda.compute_semantics(sub_mat)
