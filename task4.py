@@ -55,8 +55,8 @@ def create_sub_sub(features, labels):
             ind = labs.index(lab)
             res[ind] = np.mean(np.array([res[ind], features[i]]), axis=0)
     res = np.array(res)
-    ans = np.matmul(res,res.transpose())
-    return [res_labs,ans,res]
+    ans = np.matmul(res, res.transpose())
+    return [res_labs, ans, res]
 
 
 data = imageLoader.load_images_from_folder(args.folder_path)
@@ -69,21 +69,20 @@ if data is not None:
     labels = sub_mat[0]
     feature_sub_mat = sub_mat[2]
     sub_mat = sub_mat[1]
+    file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_subject_" + str(args.k) + ".json"
     if args.tech == 'pca':
         # PCA
         args.tech
     elif args.tech == 'svd':
         svd = SVD(args.k)
         latent_data = [labels, svd.compute_semantics(sub_mat), sub_mat.tolist(), feature_sub_mat.tolist()]
-        print_semantics_sub(labels,np.matmul(np.array(latent_data[1][0]),np.array(latent_data[1][1])))
-        file_name = "latent_semantics_"+args.feature_model+"_"+args.tech+"_subject_"+str(args.k)+".json"
-        save_features_to_json(args.folder_path,latent_data,file_name)
+        print_semantics_sub(labels, np.matmul(np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech == 'lda':
-        lda = LDA(k=args.k)
+        lda = LDA(args.k)
         lda.compute_semantics(sub_mat)
         latent_data = lda.transform_data(sub_mat)
         print_semantics_sub(labels, latent_data)
-        file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_subject_" + str(args.k)
         lda.save_model(file_name)
         save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
     else:
@@ -91,7 +90,5 @@ if data is not None:
         kmeans.compute_semantics(sub_mat)
         latent_data = kmeans.transform_data(sub_mat)
         print_semantics_sub(labels, latent_data)
-        file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(
-            args.k) + ".json"
         kmeans.save_model(file_name)
         save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
