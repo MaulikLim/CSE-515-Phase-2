@@ -10,7 +10,7 @@ import datetime
 from tech.SVD import SVD
 from utilities import intersection_similarity_between_features, print_semantics_type
 
-parser = argparse.ArgumentParser(description="Task 5")
+parser = argparse.ArgumentParser(description="Task 7")
 parser.add_argument(
     "-fp",
     "--folder_path",
@@ -25,18 +25,28 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-k",
-    "--k",
-    type=int,
-    required=True,
-)
-parser.add_argument(
     "-q",
     "--image_path",
     type=str,
     required=True,
 )
 args = parser.parse_args()
+
+def getSubject(result, isDist):
+    scores = {}
+    for res in result:
+        label = res[0].split("-")[2]
+        if label not in scores:
+            scores[label] = 0
+        scores[label] += res[1]
+    ans = ""
+    maxScore = 0
+    for x,y in scores.items():
+        if ans=="" or (not isDist and y>maxScore) or (isDist and y<maxScore):
+            maxScore = y
+            ans = x
+    return ans
+
 
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
@@ -71,14 +81,8 @@ if data is not None:
         for ind,d in enumerate(new_data):
             sim_score = np.sum(np.abs(d-l_q_feature_mat))
             result.append([labels[ind],sim_score])
-        result = sorted(result, key=lambda x: x[1])[:args.k]
-        i=0
-        for ele in result:
-            i+=1
-            print(i,ele[0], "Similarity score::",ele[1])
-            imageLoader.show_image(os.path.join(args.folder_path,ele[0]))
+        print(getSubject(result,True))
     elif(tech=='lda'):
         pass
     else:
         pass
-

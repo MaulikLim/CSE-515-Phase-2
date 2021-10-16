@@ -10,7 +10,7 @@ from tech.SVD import SVD
 from tech.LDA import LDA
 from utilities import print_semantics_sub
 
-parser = argparse.ArgumentParser(description="Task 3")
+parser = argparse.ArgumentParser(description="Task 4")
 parser.add_argument(
     "-fp",
     "--folder_path",
