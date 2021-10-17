@@ -61,7 +61,6 @@ if data is not None:
         #PCA
         pass
     elif(tech=='svd'):
-
         labels = data[0]
         r_mat = np.array(l_features[1][2]).transpose()
         if type=='type' or type=='subject':

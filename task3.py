@@ -41,23 +41,54 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-def create_type_type(features, labels):
-    res = []
-    labs = []
-    res_labs = []
-    for i in range(len(labels)):
-        lab = labels[i].split("-")[1]
-        if lab not in labs:
-            labs.append(lab)
-            res_labs.append(labels[i])
-            res.append(features[i])
+# def create_type_type():
+#     res = []
+#     labs = []
+#     res_labs = []
+#     for i in range(len(labels)):
+#         lab = labels[i].split("-")[1]
+#         if lab not in labs:
+#             labs.append(lab)
+#             res_labs.append(labels[i])
+#             res.append(features[i])
+#         else:
+#             ind = labs.index(lab)
+#             res[ind] = np.mean(np.array([res[ind], features[i]]), axis=0)
+#     res = np.array(res)
+#     print(res.shape, "res")
+#     ans = np.matmul(res, res.transpose())
+#     return [res_labs, ans, res]
+
+def create_type_type(metrics, labels):
+    type_metrics = {}
+    res_labels = []
+    for x in range(len(labels)):
+        image_type = labels[x].split("-")[1]
+        type_data = []
+        if image_type in type_metrics:
+            type_data = type_metrics[image_type]
         else:
-            ind = labs.index(lab)
-            res[ind] = np.mean(np.array([res[ind], features[i]]), axis=0)
-    res = np.array(res)
-    print(res.shape, "res")
-    ans = np.matmul(res, res.transpose())
-    return [res_labs, ans, res]
+            res_labels.append(labels[x])
+        type_data.append(metrics[x])
+        type_metrics[image_type] = type_data
+    y = metrics.shape[1]
+    type_features = []
+    types = []
+    index = 0
+    for image_type, data in type_metrics.items():
+        types.append(image_type)
+        count = 0
+        type_weight = np.zeros(y)
+        for d in data:
+            type_weight += d
+            count += 1
+        type_features.append(type_weight/count)
+        index += 1
+    type_features = np.array(type_features)
+    type_type = np.matmul(type_features, type_features.T)
+    print(res_labels)
+    print(types)
+    return [res_labels, type_type, type_features]
 
 
 data = imageLoader.load_images_from_folder(args.folder_path)
@@ -73,14 +104,17 @@ if data is not None:
     print(feature_type_mat.shape, "feature_type")
     type_mat = type_mat[1]
     print(type_mat.shape)
-    file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_type_" + str(args.k) + ".json"
+    file_name = "latent_semantics_" + args.feature_model + \
+        "_" + args.tech + "_type_" + str(args.k) + ".json"
     if args.tech == 'pca':
         # PCA
         args.tech
     elif args.tech == 'svd':
         svd = SVD(args.k)
-        latent_data = [labels, svd.compute_semantics(type_mat), type_mat.tolist(), feature_type_mat.tolist()]
-        print_semantics_type(labels, np.matmul(np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        latent_data = [labels, svd.compute_semantics(
+            type_mat), type_mat.tolist(), feature_type_mat.tolist()]
+        print_semantics_type(labels, np.matmul(
+            np.array(latent_data[1][0]), np.array(latent_data[1][1])))
         save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech.lower() == 'lda':
         lda = LDA(args.k)
@@ -88,11 +122,13 @@ if data is not None:
         latent_data = lda.transform_data(type_mat)
         print_semantics_type(labels, latent_data)
         lda.save_model(file_name)
-        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
+        save_features_to_json(args.folder_path, [
+                              labels, latent_data.tolist(), feature_type_mat.tolist()], file_name)
     else:
         kmeans = KMeans(args.k)
         kmeans.compute_semantics(type_mat)
         latent_data = kmeans.transform_data(type_mat)
         print_semantics_type(labels, latent_data)
         kmeans.save_model(file_name)
-        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
+        save_features_to_json(
+            args.folder_path, [labels, latent_data.tolist()], file_name)
