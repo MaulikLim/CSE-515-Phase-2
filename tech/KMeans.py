@@ -101,12 +101,11 @@ class KMeans:
                 self.obj_fun_val += np.sum(np.array((self.clusters[key]) - self.centroids[key]) ** 2)
 
     def compute_semantics(self, data):
-        self.initialize_centers(data, init_strategy=1)
+        self.initialize_centers(data, init_strategy=2)
         self.cluster(data)
 
     def transform_data(self, data, *args, **kwargs):
         data_cluster_index = []
-        distances = np.zeros(data.shape[0])
         for example in data:
             min_dist_ctr = np.argmin(np.sum((self.centroids - example) ** 2, axis=1))
             data_cluster_index.append(min_dist_ctr)
