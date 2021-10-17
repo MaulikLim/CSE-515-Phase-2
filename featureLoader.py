@@ -3,6 +3,7 @@ from genericpath import isfile
 import os
 import json
 
+
 # Loads json file of feature descriptor
 def load_json(file_path):
     if os.path.isfile(file_path):
