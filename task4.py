@@ -59,30 +59,34 @@ args = parser.parse_args()
 #     return [res_labs, ans, res]
 
 def create_sub_sub(metrics, labels):
-  subject_metrics = {}
-  for x in range(len(labels)):
-    subject = labels[x].split("-")[2]
-    subject_data = []
-    if subject in subject_metrics:
-      subject_data = subject_metrics[subject]
-    subject_data.append(metrics[x])
-    subject_metrics[subject] = subject_data
-  y = metrics.shape[1]
-  subject_features = []
-  subjects = []
-  index = 0
-  for sub, data in subject_metrics.items():
-    subjects.append(sub)
-    count = 0
-    subject_weight = np.zeros(y)
-    for d in data:
-      subject_weight += d
-      count += 1
-    subject_features.append(subject_weight/count)
-    index += 1
-  subject_features = np.array(subject_features)
-  sub_sub = np.matmul(subject_features, subject_features.T)
-  return [subjects, sub_sub, subject_features]
+    subject_metrics = {}
+    res_labels = []
+    for x in range(len(labels)):
+        subject = labels[x].split("-")[2]
+        subject_data = []
+        if subject in subject_metrics:
+            subject_data = subject_metrics[subject]
+        else:
+            res_labels.append(labels[x])
+        subject_data.append(metrics[x])
+        subject_metrics[subject] = subject_data
+    y = metrics.shape[1]
+    subject_features = []
+    subjects = []
+    index = 0
+    for sub, data in subject_metrics.items():
+        subjects.append(sub)
+        count = 0
+        subject_weight = np.zeros(y)
+        for d in data:
+            subject_weight += d
+            count += 1
+        subject_features.append(subject_weight/count)
+        index += 1
+    subject_features = np.array(subject_features)
+    sub_sub = np.matmul(subject_features, subject_features.T)
+    return [res_labels, sub_sub, subject_features]
+
 
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
@@ -94,14 +98,17 @@ if data is not None:
     labels = sub_mat[0]
     feature_sub_mat = sub_mat[2]
     sub_mat = sub_mat[1]
-    file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_subject_" + str(args.k) + ".json"
+    file_name = "latent_semantics_" + args.feature_model + \
+        "_" + args.tech + "_subject_" + str(args.k) + ".json"
     if args.tech == 'pca':
         # PCA
         args.tech
     elif args.tech == 'svd':
         svd = SVD(args.k)
-        latent_data = [labels, svd.compute_semantics(sub_mat), sub_mat.tolist(), feature_sub_mat.tolist()]
-        print_semantics_sub(labels, np.matmul(np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        latent_data = [labels, svd.compute_semantics(
+            sub_mat), sub_mat.tolist(), feature_sub_mat.tolist()]
+        print_semantics_sub(labels, np.matmul(
+            np.array(latent_data[1][0]), np.array(latent_data[1][1])))
         save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech == 'lda':
         lda = LDA(args.k)
@@ -109,11 +116,13 @@ if data is not None:
         latent_data = lda.transform_data(sub_mat)
         print_semantics_sub(labels, latent_data)
         lda.save_model(file_name)
-        save_features_to_json(args.folder_path, [labels, latent_data.tolist(), feature_sub_mat.tolist()], file_name)
+        save_features_to_json(args.folder_path, [
+                              labels, latent_data.tolist(), feature_sub_mat.tolist()], file_name)
     else:
         kmeans = KMeans(args.k)
         kmeans.compute_semantics(sub_mat)
         latent_data = kmeans.transform_data(sub_mat)
         print_semantics_sub(labels, latent_data)
         kmeans.save_model(file_name)
-        save_features_to_json(args.folder_path, [labels, latent_data.tolist()], file_name)
+        save_features_to_json(
+            args.folder_path, [labels, latent_data.tolist()], file_name)

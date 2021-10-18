@@ -78,9 +78,10 @@ if data is not None:
         i = 0
         for ele in result:
             i += 1
-            print(i, ele[0], "Similarity score::", ele[1])
+            print(i, ele[0], "Distance score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     elif tech == 'lda':
+        l_features = load_json(args.latent_path)
         print(len(l_features))
         lda = LDA(file_name=file_name)
         labels = data[0]
@@ -116,7 +117,7 @@ if data is not None:
         i = 0
         for ele in result:
             i += 1
-            print(i, ele[0], "Similarity score::", ele[1])
+            print(i, ele[0], "Distance score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     else:
         with open(args.latent_path, 'rb') as f:
@@ -148,5 +149,5 @@ if data is not None:
         i = 0
         for ele in result:
             i += 1
-            print(i, ele[0], "Similarity score::", ele[1])
+            print(i, ele[0], "Distance score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
