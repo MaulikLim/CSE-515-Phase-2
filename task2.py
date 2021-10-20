@@ -61,7 +61,8 @@ if data is not None:
         save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech == 'lda':
         lda = LDA(k=args.k)
-        lda.compute_semantics(lda_helper.transform_cm_for_lda(data))
+        data = lda_helper.transform_cm_for_lda(data)
+        lda.compute_semantics(data)
         latent_data = lda.transform_data(data)
         print_semantics_type(labels, latent_data)
         lda.save_model(file_name)

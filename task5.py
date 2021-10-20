@@ -10,6 +10,8 @@ import os
 import numpy as np
 import datetime
 from tech.SVD import SVD
+from tech.LDA import LDA
+import tech.LDAHelper as lda_helper
 from utilities import intersection_similarity_between_features, print_semantics_type
 
 parser = argparse.ArgumentParser(description="Task 5")
@@ -76,10 +78,47 @@ if data is not None:
         i = 0
         for ele in result:
             i += 1
-            print(i, ele[0], "Similarity score::", ele[1])
+            print(i, ele[0], "Distance score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     elif tech == 'lda':
-        pass
+        l_features = load_json(args.latent_path)
+        print(len(l_features))
+        lda = LDA(file_name=file_name)
+        labels = data[0]
+        original_metrics = model.compute_features_for_images(data[1])
+        if type == 'type' or type == 'subject':
+            transform_matrix = np.array(l_features[2]).T
+            original_metrics = np.matmul(original_metrics, transform_matrix)
+            print(original_metrics.shape, end='')
+            print('intermediate transformation')
+        else:
+            original_metrics = lda_helper.transform_cm_for_lda(original_metrics)
+        original_metrics = lda.transform_data(original_metrics)
+        print(original_metrics.shape, end='')
+        print('final transformation')
+
+        q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
+        q_feature_mat = q_feature_mat.reshape([1, q_feature_mat.shape[0]])
+        if type == 'type' or type == 'subject':
+            q_feature_mat = np.matmul(q_feature_mat, transform_matrix)
+        else:
+            q_feature_mat = lda_helper.transform_cm_for_lda(q_feature_mat)
+        print(q_feature_mat.shape, end='')
+        print('query intermediate transformation')
+
+        q_feature_mat = lda.transform_data(q_feature_mat)
+        print(q_feature_mat.shape, end='')
+        print('query final transformation')
+        result = []
+        for ind, d in enumerate(original_metrics):
+            sim_score = np.sum(np.abs(d - q_feature_mat))
+            result.append([labels[ind], sim_score])
+        result = sorted(result, key=lambda x: x[1])[:args.k]
+        i = 0
+        for ele in result:
+            i += 1
+            print(i, ele[0], "Distance score:", ele[1])
+            imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     else:
         with open(args.latent_path, 'rb') as f:
             centroids = pickle.load(f)
@@ -112,5 +151,5 @@ if data is not None:
         i = 0
         for ele in result:
             i += 1
-            print(i, ele[0], "Similarity score::", ele[1])
+            print(i, ele[0], "Distance score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
