@@ -125,4 +125,7 @@ if data is not None:
         print_semantics_sub(labels, latent_data)
         kmeans.save_model(file_name)
         save_features_to_json(
-            args.folder_path, [labels, latent_data.tolist()], file_name)
+            args.folder_path,
+            [labels, latent_data.tolist(), kmeans.centroids.tolist(), feature_sub_mat.tolist()],
+            file_name
+        )

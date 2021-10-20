@@ -120,12 +120,18 @@ if data is not None:
             print(i, ele[0], "Distance score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     else:
-        with open(args.latent_path, 'rb') as f:
-            centroids = pickle.load(f)
+        l_features = load_json(args.latent_path)
+        # with open(args.latent_path, 'rb') as f:
+        centroids = l_features[2]
         labels = data[0]
+        feature_type_mat = []
+        if type == 'type' or type == 'subject':
+            feature_type_mat = np.array(l_features[3])
         data_cluster_index, data_in_latent_space, data_cluster_dist = [], [], []
         for d in data[1]:
             feature_mat = model.compute_features(d)
+            if type == 'type' or type == 'subject':
+                feature_mat = np.matmul(feature_mat, feature_type_mat.T)
             min_dist_arr = np.sum((centroids - feature_mat) ** 2, axis=1)
             # min_dist_ctr = np.argmin(min_dist_arr)
             # data_cluster_index.append(min_dist_ctr)

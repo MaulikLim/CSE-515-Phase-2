@@ -124,4 +124,42 @@ if data is not None:
             i += 1
             print(i, ele[0], "Distance score:", ele[1])
     else:
-        pass
+        l_features = load_json(args.latent_path)
+        # with open(args.latent_path, 'rb') as f:
+        centroids = l_features[2]
+        labels = data[0]
+        feature_type_mat = []
+        if type == 'type' or type == 'subject':
+            feature_type_mat = np.array(l_features[3])
+        data_cluster_index, data_in_latent_space, data_cluster_dist = [], [], []
+        for d in data[1]:
+            feature_mat = model.compute_features(d)
+            if type == 'type' or type == 'subject':
+                feature_mat = np.matmul(feature_mat, feature_type_mat.T)
+            min_dist_arr = np.sum((centroids - feature_mat) ** 2, axis=1)
+            # min_dist_ctr = np.argmin(min_dist_arr)
+            # data_cluster_index.append(min_dist_ctr)
+            # data_cluster_dist.append(np.min(min_dist_arr))
+            data_in_latent_space.append(min_dist_arr)
+        # data_cluster_index = np.array(data_cluster_index)
+        # data_in_latent_space = np.zeros((data_cluster_index.size, centroids.shape[0]))
+        # data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = data_cluster_dist
+
+        query_features = model.compute_features(imageLoader.load_image(args.image_path))
+        min_dist_arr = np.sum((centroids - query_features) ** 2, axis=1)
+        # min_dist_ctr = np.argmin(min_dist_arr)
+        # query_in_latent_space = np.zeros(centroids.shape[0])
+        # query_in_latent_space[min_dist_ctr] = np.min(min_dist_arr)
+        query_in_latent_space = min_dist_arr
+
+        result = []
+        for ind, d in enumerate(data_in_latent_space):
+            sim_score = np.sum(np.linalg.norm(d - query_in_latent_space))
+            result.append([labels[ind], sim_score])
+
+        result = sorted(result, key=lambda x: x[1])[:args.k]
+        i = 0
+        for ele in result:
+            i += 1
+            print(i, ele[0], "Distance score:", ele[1])
+            imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
