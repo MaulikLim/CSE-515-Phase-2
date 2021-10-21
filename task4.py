@@ -95,6 +95,11 @@ if data is not None:
     labels = sub_mat[0]
     feature_sub_mat = sub_mat[2]
     sub_mat = sub_mat[1]
+
+    sub_sub_file_name = "sub_sub_"+args.feature_model+".json"
+    
+    save_features_to_json(args.folder_path, [labels,sub_mat.tolist()], sub_sub_file_name)
+
     file_name = "latent_semantics_" + args.feature_model + \
         "_" + args.tech + "_subject_" + str(args.k) + ".json"
     if args.tech == 'pca':

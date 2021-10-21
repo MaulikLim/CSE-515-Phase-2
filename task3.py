@@ -61,14 +61,11 @@ args = parser.parse_args()
 
 def create_type_type(metrics, labels):
     type_metrics = {}
-    res_labels = []
     for x in range(len(labels)):
         image_type = labels[x].split("-")[1]
         type_data = []
         if image_type in type_metrics:
             type_data = type_metrics[image_type]
-        else:
-            res_labels.append(image_type)
         type_data.append(metrics[x])
         type_metrics[image_type] = type_data
     y = metrics.shape[1]
@@ -86,9 +83,7 @@ def create_type_type(metrics, labels):
         index += 1
     type_features = np.array(type_features)
     type_type = np.matmul(type_features, type_features.T)
-    print(res_labels)
-    print(types)
-    return [res_labels, type_type, type_features]
+    return [types, type_type, type_features]
 
 
 data = imageLoader.load_images_from_folder(args.folder_path)
@@ -97,13 +92,14 @@ if data is not None:
     images = data[1]
     labels = data[0]
     features = model.compute_features_for_images(images)
-    print(features.shape, "features")
     type_mat = create_type_type(features, labels)
     labels = type_mat[0]
     feature_type_mat = type_mat[2]
-    print(feature_type_mat.shape, "feature_type")
     type_mat = type_mat[1]
-    print(type_mat.shape)
+    type_type_file_name = "type_type_"+args.feature_model+".json"
+    
+    save_features_to_json(args.folder_path, [labels,type_mat.tolist()], type_type_file_name)
+
     file_name = "latent_semantics_" + args.feature_model + \
         "_" + args.tech + "_type_" + str(args.k) + ".json"
     if args.tech == 'pca':
