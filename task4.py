@@ -60,14 +60,11 @@ args = parser.parse_args()
 
 def create_sub_sub(metrics, labels):
     subject_metrics = {}
-    res_labels = []
     for x in range(len(labels)):
         subject = labels[x].split("-")[2]
         subject_data = []
         if subject in subject_metrics:
             subject_data = subject_metrics[subject]
-        else:
-            res_labels.append(labels[x])
         subject_data.append(metrics[x])
         subject_metrics[subject] = subject_data
     y = metrics.shape[1]
@@ -85,7 +82,7 @@ def create_sub_sub(metrics, labels):
         index += 1
     subject_features = np.array(subject_features)
     sub_sub = np.matmul(subject_features, subject_features.T)
-    return [res_labels, sub_sub, subject_features]
+    return [subjects, sub_sub, subject_features]
 
 
 data = imageLoader.load_images_from_folder(args.folder_path)

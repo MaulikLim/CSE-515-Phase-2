@@ -68,7 +68,7 @@ def create_type_type(metrics, labels):
         if image_type in type_metrics:
             type_data = type_metrics[image_type]
         else:
-            res_labels.append(labels[x])
+            res_labels.append(image_type)
         type_data.append(metrics[x])
         type_metrics[image_type] = type_data
     y = metrics.shape[1]

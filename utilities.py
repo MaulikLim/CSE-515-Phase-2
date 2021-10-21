@@ -4,7 +4,10 @@ import numpy as np
 def extract_type_weight_pairs(labels, metrics):
     type_metrics = {}
     for x in range(len(labels)):
-        image_type = labels[x].split("-")[1]
+        if "-" in labels[x]:
+            image_type = labels[x].split("-")[1]
+        else:
+            image_type = labels[x]
         type_data = []
         if image_type in type_metrics:
             type_data = type_metrics[image_type]
@@ -41,7 +44,10 @@ def print_semantics_type(labels, metrics):
 def extract_subject_weight_pairs(labels, metrics):
     subject_metrics = {}
     for x in range(len(labels)):
-        subject = labels[x].split("-")[2]
+        if "-" in labels[x]:
+            subject = labels[x].split("-")[2]
+        else:
+            subject = labels[x]
         subject_data = []
         if subject in subject_metrics:
             subject_data = subject_metrics[subject]
