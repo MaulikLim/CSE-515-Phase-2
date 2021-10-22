@@ -48,8 +48,7 @@ sub_ids = args.subid.split("-")
 a = np.array(sub_sub_mat[1])
 labels = np.array(sub_sub_mat[0])
 rows,cols = a.shape
-s = np.random.random((40,40))
-topn = np.zeros((40,n))
+topn = np.zeros((a.shape[0],n))
 for i in range(len(sub_ids)):
     sub_ids[i] = np.where(labels==sub_ids[i])[0][0] + 1
 for i in range(rows):
@@ -59,7 +58,7 @@ for i in range(rows):
         topn[i][j] = temp[j]
 #     print(topn[i])
     topn[i].sort()
-temp = np.zeros((40,40))
+temp = np.zeros(a.shape)
 for i in range(len(topn)):
     for j in range(len(topn[i])):
         temp[i][int(topn[i][j])] = a[i][int(topn[i][j])]
@@ -110,6 +109,8 @@ def task9(subject_subject_Matrix,subjectIds,m):
         if(topm>0):
             print(i)
             topm=topm-1
+        else:
+            break
         
         #print(i)
 

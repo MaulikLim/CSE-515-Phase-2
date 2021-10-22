@@ -41,9 +41,9 @@ m = int(args.m)
 a = np.array(sub_sub_mat[1])
 labels = np.array(sub_sub_mat[0])
 rows,cols = a.shape
-s = np.random.random((40,40))
+s = np.ones(a.shape)
 
-topn = np.zeros((40,n))
+topn = np.zeros((a.shape[0],n))
 
 for i in range(rows):
     temp = []
@@ -52,14 +52,14 @@ for i in range(rows):
         topn[i][j] = temp[j]
 #     print(topn[i])
     topn[i].sort()
-temp = np.zeros((40,40))
+temp = np.zeros(a.shape)
 for i in range(len(topn)):
     for j in range(len(topn[i])):
         temp[i][int(topn[i][j])] = a[i][int(topn[i][j])]
 
 diff = 100000
 c=0.85
-sumweight=np.zeros((40,1))
+sumweight=np.zeros((a.shape[0],1))
 
 for i in range(rows):
     for j in range(cols):
@@ -84,4 +84,4 @@ for i in range(rows):
     topK[i] = np.sum(s[:][i])/rows
 indices = np.flip(np.argsort(topK, axis = 0))
 for ind in indices[:m]:
-    print(labels[ind])
+    print(int(labels[ind]))
