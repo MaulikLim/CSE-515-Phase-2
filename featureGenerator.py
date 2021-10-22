@@ -13,11 +13,10 @@ def save_features_to_json(folder_path, feature_descriptors, file_name):
         out_file.write(json_feature_descriptors)
 
 # Generates feature vectors for each model for all images and saves them to a json file
-def generate_and_save_features(labels, images, folder_path):
-    models = modelFactory.get_all_models()
+def generate_and_save_features(labels, images, model_name, folder_path, file_name='feature_descriptors.json'):
+    model = modelFactory.get_model(model_name)
     feature_descriptors = {}
     feature_descriptors['labels'] = labels
-    for model in models:
-        features = model.compute_features_for_images(images)
-        feature_descriptors[model.name] = features.tolist()
-    save_features_to_json(folder_path, feature_descriptors)
+    features = model.compute_features_for_images(images)
+    feature_descriptors[model.name] = features.tolist()
+    save_features_to_json(folder_path, feature_descriptors, file_name)
