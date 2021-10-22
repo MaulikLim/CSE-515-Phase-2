@@ -27,13 +27,16 @@ def extract_type_weight_pairs(labels, metrics):
     return [types, type_weights]
 
 
-def print_semantics_type(labels, metrics):
+def print_semantics_type(labels, metrics, do_rev=False):
     subjects, subject_weights = extract_type_weight_pairs(labels, metrics)
     subject_weights = np.array(subject_weights)
     for x in range(subject_weights.shape[1]):
         print("latent semantic " + str(x) + ":", end=" ")
         semantic_weights = subject_weights[:, x:x + 1].flatten()
-        sorted_order = np.flip(np.argsort(semantic_weights))
+        if do_rev:
+            sorted_order = np.argsort(semantic_weights)
+        else:
+            sorted_order = np.flip(np.argsort(semantic_weights))
         for x in sorted_order:
             print(subjects[x] + "=" + str(semantic_weights[x]), end=" ")
         print()
@@ -65,13 +68,16 @@ def extract_subject_weight_pairs(labels, metrics):
     return [subjects, subject_weights]
 
 
-def print_semantics_sub(labels, metrics):
+def print_semantics_sub(labels, metrics, do_rev=False):
     subjects, subject_weights = extract_subject_weight_pairs(labels, metrics)
     subject_weights = np.array(subject_weights)
     for x in range(subject_weights.shape[1]):
         print("latent semantic " + str(x) + ":", end=" ")
         semantic_weights = subject_weights[:, x:x + 1].flatten()
-        sorted_order = np.flip(np.argsort(semantic_weights))
+        if do_rev:
+            sorted_order = np.argsort(semantic_weights)
+        else:
+            sorted_order = np.flip(np.argsort(semantic_weights))
         for x in sorted_order:
             print(subjects[x] + "=" + str(semantic_weights[x]), end=" ")
         print()

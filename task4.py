@@ -128,6 +128,6 @@ if data is not None:
         kmeans.save_model(file_name)
         save_features_to_json(
             args.folder_path,
-            [labels, latent_data.tolist(), kmeans.centroids.tolist(), feature_sub_mat.tolist()],
+            [labels, latent_data, kmeans.centroids.tolist(), feature_sub_mat.tolist()],
             file_name
         )
