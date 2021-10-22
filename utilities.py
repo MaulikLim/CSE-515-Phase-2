@@ -16,7 +16,6 @@ def extract_type_weight_pairs(labels, metrics):
     y = metrics.shape[1]
     type_weights = []
     types = []
-    index = 0
     for image_type, data in type_metrics.items():
         types.append(image_type)
         count = 0
@@ -25,7 +24,6 @@ def extract_type_weight_pairs(labels, metrics):
             type_weight += d
             count += 1
         type_weights.append(type_weight / count)
-        index += 1
     return [types, type_weights]
 
 
@@ -59,7 +57,6 @@ def extract_subject_weight_pairs(labels, metrics):
     y = metrics.shape[1]
     subject_weights = []
     subjects = []
-    index = 0
     for sub, data in subject_metrics.items():
         subjects.append(sub)
         count = 0
@@ -68,7 +65,6 @@ def extract_subject_weight_pairs(labels, metrics):
             subject_weight += d
             count += 1
         subject_weights.append(subject_weight / count)
-        index += 1
     return [subjects, subject_weights]
 
 

@@ -21,7 +21,7 @@ class ELBP:
         lbp = local_binary_pattern(image, self.p, self.r, self.method)
         return np.histogram(lbp.ravel(), bins=self.p+2, range=(0, self.p + 1))[0]
     
-    def compute_feature(self, image):
+    def compute_features(self, image):
         elbp = self.get_lbp(image)
         var = self.get_var_mat(image,10)
         feature = np.zeros([self.p+2, 10])

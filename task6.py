@@ -81,10 +81,21 @@ if data is not None:
             q_feature_mat = np.matmul(q_feature_mat, feature_type_mat.T)
         l_q_feature_mat = np.matmul(q_feature_mat, r_mat)
         result = []
-        for ind, d in enumerate(new_data):
-            sim_score = np.sum(np.abs(d - l_q_feature_mat))
-            result.append([labels[ind], sim_score])
-        print(getType(result, True))
+        if info[2] == 'cm':
+            for ind, d in enumerate(new_data):
+                sim_score = np.sum(np.abs(d - l_q_feature_mat))
+                result.append([labels[ind], sim_score])
+            print(getType(result, True))
+        elif info[2] == 'elbp':
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            print(getType(result, False))
+        else:
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            print(getType(result, False))
     elif tech == 'lda':
         l_features = load_json(args.latent_path)
         print(len(l_features))
