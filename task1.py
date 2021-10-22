@@ -55,7 +55,6 @@ if data is not None:
     data = model.compute_features_for_images(images)
     file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(args.k) + ".json"
     if args.tech.lower() == 'pca':
-        pdb.set_trace()
         pca = PCA(args.k)
         latent_data = [labels, pca.compute_semantics(data)]
         print_semantics_sub(labels,np.matmul(data,np.array(latent_data[1][0])))
