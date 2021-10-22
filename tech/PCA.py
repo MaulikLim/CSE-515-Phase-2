@@ -23,4 +23,4 @@ class PCA:
                 break
         #eig_mat = np.sqrt(np.diag(np.array(eig_mat)))
         print(np.array(eig_vectors).shape)
-        return [np.array(eig_vectors).transpose().tolist(), eig_mat.tolist(), np.array(eig_vectors).tolist()]
+        return [np.array(eig_vectors).transpose().tolist(), eig_mat, np.array(eig_vectors).tolist()]
