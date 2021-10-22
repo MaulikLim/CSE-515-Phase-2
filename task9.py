@@ -96,7 +96,7 @@ def task9(subject_subject_Matrix,subjectIds,m):
     transition_matrix = generate_transitionMatrix(subject_subject_Matrix)
     #transition_matrix = generate_transitionMatrix(40)
     seed_matrix = generate_seedMatrix(subjectIds,subject_subject_Matrix.shape[0])
-    pageranks = pageRank(transition_matrix,0.8,seed_matrix)
+    pageranks = pageRank(transition_matrix,0.85,seed_matrix)
     subject_rank = dict()
     i=0
     pageranks.reshape((pageranks.shape[0],))
@@ -105,8 +105,14 @@ def task9(subject_subject_Matrix,subjectIds,m):
         subject_rank[labels[i]] = rank[0]
         i+=1
     reverse_subject_rank = sorted(subject_rank.items(),key = lambda x : x[1],reverse = True)
+    topm = m
     for i in dict(reverse_subject_rank).keys():
-        print(i)
+        if(topm>0):
+            print(i)
+            topm=topm-1
+        
+        #print(i)
+
     # for i in np.arange(m):
     #     row = reverse_subject_rank[i]
     #     print(row[0],row[1])
