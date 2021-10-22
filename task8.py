@@ -27,19 +27,19 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "-lp",
-    "--latent_path",
+    "-sp",
+    "--sub_path",
     type=str,
     required=True,
 )
 
 args = parser.parse_args()
 
-l_features = load_json(args.latent_path)
+sub_sub_mat = load_json(args.sub_path)
 n = int(args.n)
 m = int(args.m)
-a = np.array(l_features[2])
-labels = np.array(l_features[0])
+a = np.array(sub_sub_mat[1])
+labels = np.array(sub_sub_mat[0])
 rows,cols = a.shape
 s = np.random.random((40,40))
 
@@ -58,7 +58,7 @@ for i in range(len(topn)):
         temp[i][int(topn[i][j])] = a[i][int(topn[i][j])]
 
 diff = 100000
-c=1
+c=0.85
 sumweight=np.zeros((40,1))
 
 for i in range(rows):
@@ -67,7 +67,7 @@ for i in range(rows):
 # print(sumweight)
     
         
-while(diff<50):
+while(diff<0.01):
     diff = 0
     for i in range(rows):
         for j in range(cols):

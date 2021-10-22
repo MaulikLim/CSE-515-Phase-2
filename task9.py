@@ -28,8 +28,8 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "-lp",
-    "--latent_path",
+    "-sp",
+    "--subject_path",
     type=str,
     required=True,
 )
@@ -41,12 +41,12 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-l_features = load_json(args.latent_path)
+sub_sub_mat = load_json(args.subject_path)
 n = int(args.n)
 m = int(args.m)
 sub_ids = args.subid.split("-")
-a = np.array(l_features[2])
-labels = np.array(l_features[0])
+a = np.array(sub_sub_mat[1])
+labels = np.array(sub_sub_mat[0])
 rows,cols = a.shape
 s = np.random.random((40,40))
 topn = np.zeros((40,n))
