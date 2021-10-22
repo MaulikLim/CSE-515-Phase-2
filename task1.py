@@ -51,7 +51,6 @@ if data is not None:
     images = data[1]
     labels = data[0]
     data = model.compute_features_for_images(images)
-    print(data.shape)
     file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.X + "_" + str(args.k) + ".json"
     if args.tech.lower() == 'pca':
         # PCA
