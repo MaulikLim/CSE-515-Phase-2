@@ -3,7 +3,9 @@ import imageLoader
 import modelFactory
 import argparse
 import numpy as np
+import pdb
 
+from tech.PCA import PCA
 from tech.KMeans import KMeans
 from tech.SVD import SVD
 from tech.LDA import LDA
@@ -52,8 +54,10 @@ if data is not None:
     data = model.compute_features_for_images(images)
     file_name = "latent_semantics_" + args.feature_model + "_" + args.tech + "_" + args.Y + "_" + str(args.k) + ".json"
     if args.tech == 'pca':
-        # PCA
-        args.tech
+        pca = PCA(args.k)
+        latent_data = [labels, pca.compute_semantics(data)]
+        print_semantics_type(labels,np.matmul(data,np.array(latent_data[1][0])))
+        save_features_to_json(args.folder_path,latent_data,file_name)
     elif args.tech == 'svd':
         svd = SVD(args.k)
         latent_data = [labels, svd.compute_semantics(data)]
