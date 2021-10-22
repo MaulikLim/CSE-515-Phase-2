@@ -79,7 +79,7 @@ def create_type_type(metrics, labels):
         for d in data:
             type_weight += d
             count += 1
-        type_features.append(type_weight/count)
+        type_features.append(type_weight / count)
         index += 1
     type_features = np.array(type_features)
     type_type = np.matmul(type_features, type_features.T)
@@ -96,12 +96,12 @@ if data is not None:
     labels = type_mat[0]
     feature_type_mat = type_mat[2]
     type_mat = type_mat[1]
-    type_type_file_name = "type_type_"+args.feature_model+".json"
-    
-    save_features_to_json(args.folder_path, [labels,type_mat.tolist()], type_type_file_name)
+    type_type_file_name = "type_type_" + args.feature_model + ".json"
+
+    save_features_to_json(args.folder_path, [labels, type_mat.tolist()], type_type_file_name)
 
     file_name = "latent_semantics_" + args.feature_model + \
-        "_" + args.tech + "_type_" + str(args.k) + ".json"
+                "_" + args.tech + "_type_" + str(args.k) + ".json"
     if args.tech == 'pca':
         # PCA
         args.tech
@@ -119,15 +119,14 @@ if data is not None:
         print_semantics_type(labels, latent_data)
         lda.save_model(file_name)
         save_features_to_json(args.folder_path, [
-                              labels, latent_data.tolist(), feature_type_mat.tolist()], file_name)
+            labels, latent_data.tolist(), feature_type_mat.tolist()], file_name)
     else:
         kmeans = KMeans(args.k)
         kmeans.compute_semantics(type_mat)
         latent_data = kmeans.transform_data(type_mat)
-        print_semantics_type(labels, latent_data)
-        # kmeans.save_model(file_name)
+        print_semantics_type(labels, np.array(latent_data), do_rev=True)
         save_features_to_json(
             args.folder_path,
-            [labels, latent_data.tolist(), kmeans.centroids.tolist(), feature_type_mat.tolist()],
+            [labels, latent_data, kmeans.centroids.tolist(), feature_type_mat.tolist()],
             file_name
         )

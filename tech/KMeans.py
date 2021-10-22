@@ -106,12 +106,15 @@ class KMeans:
 
     def transform_data(self, data, *args, **kwargs):
         data_cluster_index = []
+        data_in_latent_space = []
         for example in data:
-            min_dist_ctr = np.argmin(np.sum((self.centroids - example) ** 2, axis=1))
-            data_cluster_index.append(min_dist_ctr)
-        data_cluster_index = np.array(data_cluster_index)
-        data_in_latent_space = np.zeros((data_cluster_index.size, self.k))
-        data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = 1
+            min_dist_arr = np.sum((self.centroids - example) ** 2, axis=1)
+            # min_dist_ctr = np.argmin(np.sum((self.centroids - example) ** 2, axis=1))
+            # data_cluster_index.append(min_dist_ctr)
+            data_in_latent_space.append(min_dist_arr.tolist())
+        # data_cluster_index = np.array(data_cluster_index)
+        # data_in_latent_space = np.zeros((data_cluster_index.size, self.k))
+        # data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = 1
         return data_in_latent_space
 
     def save_model(self, file_name):
