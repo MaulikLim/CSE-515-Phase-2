@@ -7,6 +7,7 @@ import os
 import numpy as np
 import datetime
 
+from tech.PCA import PCA
 from tech.KMeans import KMeans
 from tech.SVD import SVD
 from tech.LDA import LDA
@@ -103,8 +104,12 @@ if data is not None:
     file_name = "latent_semantics_" + args.feature_model + \
         "_" + args.tech + "_subject_" + str(args.k) + ".json"
     if args.tech == 'pca':
-        # PCA
-        args.tech
+        pca = PCA(args.k)
+        latent_data = [labels, pca.compute_semantics(
+            sub_mat), sub_mat.tolist(), feature_sub_mat.tolist()]
+        print_semantics_sub(labels, np.matmul(
+            np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech == 'svd':
         svd = SVD(args.k)
         latent_data = [labels, svd.compute_semantics(
