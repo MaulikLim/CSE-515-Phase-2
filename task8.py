@@ -41,7 +41,7 @@ m = int(args.m)
 a = np.array(sub_sub_mat[1])
 labels = np.array(sub_sub_mat[0])
 rows,cols = a.shape
-s = np.ones(a.shape)
+s = np.random.random(a.shape)
 
 topn = np.zeros((a.shape[0],n))
 
@@ -51,7 +51,7 @@ for i in range(rows):
     for j in range(n):
         topn[i][j] = temp[j]
 #     print(topn[i])
-    topn[i].sort()
+    # topn[i].sort()
 temp = np.zeros(a.shape)
 for i in range(len(topn)):
     for j in range(len(topn[i])):
@@ -59,15 +59,15 @@ for i in range(len(topn)):
 
 diff = 100000
 c=0.85
-sumweight=np.zeros((a.shape[0],1))
+sumweight=np.zeros(a.shape[0])
 
 for i in range(rows):
     for j in range(cols):
-        sumweight[i]+=temp[i][j]
+        sumweight[i]+=temp[j][i]
 # print(sumweight)
     
         
-while(diff<0.01):
+while(diff>0.0000001):
     diff = 0
     for i in range(rows):
         for j in range(cols):
@@ -75,10 +75,13 @@ while(diff<0.01):
                 s[i][j]=1
                 continue
             sum=0
-            for k in range(topn[i]):
-                sum+=(a[i][k]/sumweight[i])*(s[k][j])*(1-math.exp(a[j][k]))
-            diff = math.abs(s[i][j]-c*sum)
-            s[i][j] = sum
+            for k in range(rows):
+                # print(sumweight[i])
+                if temp[k][i]==0:
+                    continue
+                sum+=(temp[k][i]/sumweight[i])*(s[k][j])*(1-math.exp(-temp[k][i]))
+            diff += abs(s[i][j]-c*sum)
+            s[i][j] = c*sum
 topK = np.zeros((rows,1))
 for i in range(rows):
     topK[i] = np.sum(s[:][i])/rows

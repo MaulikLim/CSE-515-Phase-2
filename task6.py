@@ -36,6 +36,8 @@ args = parser.parse_args()
 
 
 def getType(result, isDist):
+    # result.sort(key=lambda x:x[1], reverse=not isDist)
+    # return result[0][0]
     scores = {}
     for res in result:
         label = res[0].split("-")[1]
@@ -49,8 +51,6 @@ def getType(result, isDist):
             maxScore = y
             ans = x
     return ans
-
-
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
     l_features = load_json(args.latent_path)
@@ -64,18 +64,15 @@ if data is not None:
         # PCA
         pass
     elif tech == 'svd':
-
         labels = data[0]
         r_mat = np.array(l_features[1][2]).transpose()
+        new_data = []
+        feature_mat = model.compute_features_for_images(data[1])
         if type == 'type' or type == 'subject':
             feature_type_mat = np.array(l_features[3])
-        new_data = []
-        for d in data[1]:
-            feature_mat = model.compute_features(d)
-            if type == 'type' or type == 'subject':
-                feature_mat = np.matmul(feature_mat, feature_type_mat.T)
-            l_feature_mat = np.matmul(feature_mat, r_mat)
-            new_data.append(l_feature_mat)
+            feature_mat = np.matmul(feature_mat,feature_type_mat.T)
+        new_data = np.matmul(feature_mat,r_mat)
+        
         q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
         if type == 'type' or type == 'subject':
             q_feature_mat = np.matmul(q_feature_mat, feature_type_mat.T)
@@ -98,33 +95,24 @@ if data is not None:
             print(getType(result, False))
     elif tech == 'lda':
         l_features = load_json(args.latent_path)
-        print(len(l_features))
         lda = LDA(file_name=file_name)
         labels = data[0]
         original_metrics = model.compute_features_for_images(data[1])
         if type == 'type' or type == 'subject':
             transform_matrix = np.array(l_features[2]).T
             original_metrics = np.matmul(original_metrics, transform_matrix)
-            print(original_metrics.shape, end='')
-            print('intermediate transformation')
         else:
             original_metrics = lda_helper.transform_cm_for_lda(original_metrics)
         original_metrics = lda.transform_data(original_metrics)
-        print(original_metrics.shape, end='')
-        print('final transformation')
-
+        
         q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
         q_feature_mat = q_feature_mat.reshape([1, q_feature_mat.shape[0]])
         if type == 'type' or type == 'subject':
             q_feature_mat = np.matmul(q_feature_mat, transform_matrix)
         else:
             q_feature_mat = lda_helper.transform_cm_for_lda(q_feature_mat)
-        print(q_feature_mat.shape, end='')
-        print('query intermediate transformation')
-
+       
         q_feature_mat = lda.transform_data(q_feature_mat)
-        print(q_feature_mat.shape, end='')
-        print('query final transformation')
         result = []
         for ind, d in enumerate(original_metrics):
             sim_score = np.sum(np.abs(d - q_feature_mat))
