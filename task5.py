@@ -71,14 +71,26 @@ if data is not None:
             q_feature_mat = np.matmul(q_feature_mat, feature_type_mat.T)
         l_q_feature_mat = np.matmul(q_feature_mat, r_mat)
         result = []
-        for ind, d in enumerate(new_data):
-            sim_score = np.sum(np.abs(d - l_q_feature_mat))
-            result.append([labels[ind], sim_score])
-        result = sorted(result, key=lambda x: x[1])[:args.k]
+        if info[2] == 'cm':
+            for ind, d in enumerate(new_data):
+                sim_score = np.sum(np.abs(d - l_q_feature_mat))
+                result.append([labels[ind], sim_score])
+            result = sorted(result, key=lambda x: x[1])[:args.k]
+        elif info[2] == 'elbp':
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            result = sorted(result, key=lambda x: x[1])[::-1][:args.k]
+        else:
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            result = sorted(result, key=lambda x: x[1])[::-1][:args.k]
+            
         i = 0
         for ele in result:
             i += 1
-            print(i, ele[0], "Distance score:", ele[1])
+            print(i, ele[0], "score:", ele[1])
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     elif tech == 'lda':
         l_features = load_json(args.latent_path)

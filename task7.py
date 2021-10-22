@@ -80,39 +80,41 @@ if data is not None:
             q_feature_mat = np.matmul(q_feature_mat,feature_type_mat.T)
         l_q_feature_mat = np.matmul(q_feature_mat,r_mat)
         result = []
-        for ind,d in enumerate(new_data):
-            sim_score = np.sum(np.abs(d-l_q_feature_mat))
-            result.append([labels[ind],sim_score])
-        print(getSubject(result,True))
+        if info[2] == 'cm':
+            for ind, d in enumerate(new_data):
+                sim_score = np.sum(np.abs(d - l_q_feature_mat))
+                result.append([labels[ind], sim_score])
+            print(getSubject(result, True))
+        elif info[2] == 'elbp':
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            print(getSubject(result, False))
+        else:
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            print(getSubject(result, False))
     elif(tech=='lda'):
         l_features = load_json(args.latent_path)
-        print(len(l_features))
         lda = LDA(file_name=file_name)
         labels = data[0]
         original_metrics = model.compute_features_for_images(data[1])
         if type == 'type' or type == 'subject':
             transform_matrix = np.array(l_features[2]).T
             original_metrics = np.matmul(original_metrics, transform_matrix)
-            print(original_metrics.shape, end='')
-            print('intermediate transformation')
         else:
             original_metrics = lda_helper.transform_cm_for_lda(original_metrics)
         original_metrics = lda.transform_data(original_metrics)
-        print(original_metrics.shape, end='')
-        print('final transformation')
-
+       
         q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
         q_feature_mat = q_feature_mat.reshape([1, q_feature_mat.shape[0]])
         if type == 'type' or type == 'subject':
             q_feature_mat = np.matmul(q_feature_mat, transform_matrix)
         else:
             q_feature_mat = lda_helper.transform_cm_for_lda(q_feature_mat)
-        print(q_feature_mat.shape, end='')
-        print('query intermediate transformation')
-
+       
         q_feature_mat = lda.transform_data(q_feature_mat)
-        print(q_feature_mat.shape, end='')
-        print('query final transformation')
         result = []
         for ind, d in enumerate(original_metrics):
             sim_score = np.sum(np.abs(d - q_feature_mat))
