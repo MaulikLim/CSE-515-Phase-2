@@ -61,8 +61,37 @@ if data is not None:
     type = info[4]
     l_k = info[5]
     if (tech == 'pca'):
-        # PCA
-        pass
+        labels = data[0]
+        r_mat = l_features[1][0]
+        if type == 'type' or type == 'subject':
+            feature_type_mat = np.array(l_features[3])
+        new_data = []
+        for d in data[1]:
+            feature_mat = model.compute_features(d)
+            if type == 'type' or type == 'subject':
+                feature_mat = np.matmul(feature_mat, feature_type_mat.T)
+            l_feature_mat = np.matmul(feature_mat, r_mat)
+            new_data.append(l_feature_mat)
+        q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
+        if type == 'type' or type == 'subject':
+            q_feature_mat = np.matmul(q_feature_mat, feature_type_mat.T)
+        l_q_feature_mat = np.matmul(q_feature_mat, r_mat)
+        result = []
+        if info[2] == 'cm':
+            for ind, d in enumerate(new_data):
+                sim_score = np.sum(np.abs(d - l_q_feature_mat))
+                result.append([labels[ind], sim_score])
+            print(getSubject(result, True))
+        elif info[2] == 'elbp':
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            print(getSubject(result, False))
+        else:
+            for ind, d in enumerate(new_data):
+                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                result.append([labels[ind], sim_score])
+            print(getSubject(result, False))
     elif (tech == 'svd'):
 
         labels = data[0]
