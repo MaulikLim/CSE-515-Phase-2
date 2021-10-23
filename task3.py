@@ -110,11 +110,9 @@ if data is not None:
                 "_" + args.tech + "_type_" + str(args.k) + ".json"
     if args.tech == 'pca':
         pca = PCA(args.k)
-        pdb.set_trace()
         latent_data = [labels, pca.compute_semantics(
             type_mat), type_mat.tolist(), feature_type_mat.tolist()]
-        print_semantics_type(labels, np.matmul(
-            np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        print_semantics_type(labels, np.array(latent_data[1][0]))
         save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech == 'svd':
         svd = SVD(args.k)
