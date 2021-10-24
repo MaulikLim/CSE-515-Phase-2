@@ -6,13 +6,13 @@ from scipy.stats import wasserstein_distance as wd
 class HOG:
 
     # Initializes the model with the given specifications
-    def __init__(self, windowX=8, windowY=8):
+    def __init__(self, windowX=16, windowY=16):
         self.name = "hog"
         self.windowX = windowX
         self.windowY = windowY
         self.orientations = 9
         self.pixels_per_cell = (windowY, windowX)
-        self.cells_per_block = (1, 1)
+        self.cells_per_block = (2, 2)
 
     # Computes the histogram features and reshapes it to make them accessible blockwise
     def compute_features(self, image):
