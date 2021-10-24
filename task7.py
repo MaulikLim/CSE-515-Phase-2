@@ -175,14 +175,14 @@ if data is not None:
         q_feature_mat = lda.transform_data(q_feature_mat)
         result = []
         for ind, d in enumerate(original_metrics):
-            sim_score = np.sum(np.abs(d - q_feature_mat))
+            sim_score = np.linalg.norm(d - q_feature_mat)
             result.append([labels[ind], sim_score])
         print(getSubject(result, True))
-        result = sorted(result, key=lambda x: x[1])[:12]
-        i = 0
-        for ele in result:
-            i += 1
-            print(i, ele[0], "Distance score:", ele[1])
+        # result = sorted(result, key=lambda x: x[1])[:12]
+        # i = 0
+        # for ele in result:
+        #     i += 1
+        #     print(i, ele[0], "Distance score:", ele[1])
     else:
         l_features = load_json(args.latent_path)
         # with open(args.latent_path, 'rb') as f:

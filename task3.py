@@ -128,7 +128,7 @@ if data is not None:
         lda.compute_semantics(type_mat)
         latent_data = lda.transform_data(type_mat)
         print_semantics_type(labels, latent_data)
-        lda.save_model(file_name)
+        lda.save_model(args.folder_path + '/' + file_name)
         save_features_to_json(args.folder_path, [
             labels, latent_data.tolist(), feature_type_mat.tolist()], file_name)
     else:

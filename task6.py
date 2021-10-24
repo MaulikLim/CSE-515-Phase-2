@@ -43,8 +43,10 @@ def getType(result, isDist):
     for res in result:
         label = res[0].split("-")[1]
         if label not in scores:
-            scores[label] = 0
-        scores[label] += res[1]
+            scores[label] = []
+        scores[label].append(res[1])
+    for x in scores.keys():
+        scores[x] = np.mean(np.array(scores[x]))
     ans = ""
     maxScore = 0
     for x, y in scores.items():
@@ -148,12 +150,14 @@ if data is not None:
         for ind, d in enumerate(original_metrics):
             sim_score = np.sum(np.abs(d - q_feature_mat))
             result.append([labels[ind], sim_score])
+        result.sort(key=lambda x: x[1])
+        result = result[:min(len(result), 100)]
         print(getType(result, True))
-        result = sorted(result, key=lambda x: x[1])[:12]
-        i = 0
-        for ele in result:
-            i += 1
-            print(i, ele[0], "Distance score:", ele[1])
+        # result = sorted(result, key=lambda x: x[1])[:12]
+        # i = 0
+        # for ele in result:
+        #     i += 1
+        #     print(i, ele[0], "Distance score:", ele[1])
     else:
         l_features = load_json(args.latent_path)
         # with open(args.latent_path, 'rb') as f:

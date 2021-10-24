@@ -43,53 +43,22 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-# def create_sub_sub(features, labels):
-#     res = []
-#     labs = []
-#     res_labs = []
-#     for i in range(len(labels)):
-#         lab = labels[i].split("-")[2]
-#         if lab not in labs:
-#             labs.append(lab)
-#             res_labs.append(labels[i])
-#             res.append(features[i])
-#         else:
-#             ind = labs.index(lab)
-#             res[ind] = np.mean(np.array([res[ind], features[i]]), axis=0)
-#     res = np.array(res)
-#     ans = np.matmul(res, res.transpose())
-#     return [res_labs, ans, res]
-
-def create_sub_sub(metrics, labels):
-    subject_metrics = {}
-    for x in range(len(labels)):
-        subject = labels[x].split("-")[2]
-        subject_data = []
-        if subject in subject_metrics:
-            subject_data = subject_metrics[subject]
-        subject_data.append(metrics[x])
-        subject_metrics[subject] = subject_data
-    y = metrics.shape[1]
-    subject_features = []
-    subjects = []
-    index = 0
-    for sub, data in subject_metrics.items():
-        subjects.append(sub)
-        count = 0
-        subject_weight = np.zeros(y)
-        for d in data:
-            subject_weight += d
-            count += 1
-        subject_features.append(subject_weight/count)
-        index += 1
-    subject_features = np.array(subject_features)
-    # sub_sub = np.matmul(subject_features, subject_features.T)
-    sub_sub = np.zeros((len(subjects),len(subjects)))
-    for i in range(subject_features.shape[0]):
-        for j in range(i,subject_features.shape[0]):
-            sub_sub[i][j] = sub_sub[j][i] = intersection_similarity_between_features(subject_features[i],subject_features[j])
-    print(sub_sub.shape)
-    return [subjects, sub_sub, subject_features]
+def create_sub_sub(features, labels):
+    res = []
+    labs = []
+    res_labs = []
+    for i in range(len(labels)):
+        lab = labels[i].split("-")[2]
+        if lab not in labs:
+            labs.append(lab)
+            res_labs.append(labels[i])
+            res.append(features[i])
+        else:
+            ind = labs.index(lab)
+            res[ind] = np.mean(np.array([res[ind], features[i]]), axis=0)
+    res = np.array(res)
+    ans = np.matmul(res, res.transpose())
+    return [res_labs, ans, res]
 
 
 data = featureLoader.load_features_for_model(args.folder_path, args.feature_model)
@@ -127,7 +96,7 @@ if data is not None:
         lda.compute_semantics(sub_mat)
         latent_data = lda.transform_data(sub_mat)
         print_semantics_sub(labels, latent_data)
-        lda.save_model(file_name)
+        lda.save_model(args.folder_path + '/' + file_name)
         save_features_to_json(args.folder_path, [
                               labels, latent_data.tolist(), feature_sub_mat.tolist()], file_name)
     else:

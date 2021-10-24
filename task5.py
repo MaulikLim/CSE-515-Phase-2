@@ -141,7 +141,6 @@ if data is not None:
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     elif tech == 'lda':
         l_features = load_json(args.latent_path)
-        print(len(l_features))
         lda = LDA(file_name=file_name)
         labels = data[0]
         # original_metrics = model.compute_features_for_images(data[1])
@@ -163,7 +162,7 @@ if data is not None:
         q_feature_mat = lda.transform_data(q_feature_mat)
         result = []
         for ind, d in enumerate(original_metrics):
-            sim_score = np.sum(np.abs(d - q_feature_mat))
+            sim_score = np.linalg.norm(d - q_feature_mat)
             result.append([labels[ind], sim_score])
         result = sorted(result, key=lambda x: x[1])[:args.k]
         i = 0
