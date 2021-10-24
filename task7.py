@@ -7,6 +7,7 @@ import json
 import os
 import numpy as np
 import datetime
+import featureLoader
 from tech.SVD import SVD
 from tech.LDA import LDA
 import tech.LDAHelper as lda_helper
@@ -50,119 +51,147 @@ def getSubject(result, isDist):
             ans = x
     return ans
 
-
-data = imageLoader.load_images_from_folder(args.folder_path)
-if data is not None:
-    l_features = load_json(args.latent_path)
-    file_name = args.latent_path.split("/")[-1]
-    info = file_name.split("_")
-    model = modelFactory.get_model(info[2])
-    tech = info[3]
-    type = info[4]
-    l_k = info[5]
-    if (tech == 'pca'):
-        # PCA
-        pass
-    elif (tech == 'svd'):
-
-        labels = data[0]
-        r_mat = np.array(l_features[1][2]).transpose()
-        if type == 'type' or type == 'subject':
-            feature_type_mat = np.array(l_features[3])
-        new_data = []
-        for d in data[1]:
-            feature_mat = model.compute_features(d)
-            if type == 'type' or type == 'subject':
-                feature_mat = np.matmul(feature_mat, feature_type_mat.T)
-            l_feature_mat = np.matmul(feature_mat, r_mat)
-            new_data.append(l_feature_mat)
-        q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
-        if type == 'type' or type == 'subject':
-            q_feature_mat = np.matmul(q_feature_mat, feature_type_mat.T)
-        l_q_feature_mat = np.matmul(q_feature_mat, r_mat)
-        result = []
-        if info[2] == 'cm':
-            for ind, d in enumerate(new_data):
-                sim_score = np.sum(np.abs(d - l_q_feature_mat))
-                result.append([labels[ind], sim_score])
-            print(getSubject(result, True))
-        elif info[2] == 'elbp':
-            for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
-                result.append([labels[ind], sim_score])
-            print(getSubject(result, False))
+def group_by_subject(labels, metrics):
+    subject_metrics = {}
+    for x in range(len(labels)):
+        if "-" in labels[x]:
+            subject = labels[x].split("-")[2]
         else:
-            for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
-                result.append([labels[ind], sim_score])
-            print(getSubject(result, False))
-    elif(tech=='lda'):
-        l_features = load_json(args.latent_path)
-        lda = LDA(file_name=file_name)
-        labels = data[0]
-        original_metrics = model.compute_features_for_images(data[1])
-        if type == 'type' or type == 'subject':
-            transform_matrix = np.array(l_features[2]).T
-            original_metrics = np.matmul(original_metrics, transform_matrix)
-        else:
-            original_metrics = lda_helper.transform_cm_for_lda(original_metrics)
-        original_metrics = lda.transform_data(original_metrics)
+            subject = labels[x]
+        subject_data = []
+        if subject in subject_metrics:
+            subject_data = subject_metrics[subject]
+        subject_data.append(metrics[x])
+        subject_metrics[subject] = subject_data
+    y = metrics.shape[1]
+    subject_weights = []
+    subjects = []
+    for sub, data in subject_metrics.items():
+        subjects.append(sub)
+        count = 0
+        subject_weight = np.zeros(y)
+        for d in data:
+            subject_weight += d
+            count += 1
+        subject_weights.append(subject_weight / count)
+    return [subjects, subject_weights]
 
-        q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
-        q_feature_mat = q_feature_mat.reshape([1, q_feature_mat.shape[0]])
-        if type == 'type' or type == 'subject':
-            q_feature_mat = np.matmul(q_feature_mat, transform_matrix)
-        else:
-            q_feature_mat = lda_helper.transform_cm_for_lda(q_feature_mat)
+# data = imageLoader.load_images_from_folder(args.folder_path)
+# if data is not None:
+l_features = load_json(args.latent_path)
+file_name = args.latent_path.split("/")[-1]
+info = file_name.split("_")
+model = modelFactory.get_model(info[2])
+tech = info[3]
+type = info[4]
+l_k = info[5]
+data = featureLoader.load_features_for_model(args.folder_path, info[2])
+if (tech == 'pca'):
+    # PCA
+    pass
+elif (tech == 'svd'):
 
-        q_feature_mat = lda.transform_data(q_feature_mat)
-        result = []
-        for ind, d in enumerate(original_metrics):
-            sim_score = np.sum(np.abs(d - q_feature_mat))
+    labels = data[0]
+    r_mat = np.array(l_features[1][2]).transpose()
+    if type == 'type' or type == 'subject':
+        feature_type_mat = np.array(l_features[3])
+    new_data = []
+    for d in data[1]:
+        feature_mat = model.compute_features(d)
+        if type == 'type' or type == 'subject':
+            feature_mat = np.matmul(feature_mat, feature_type_mat.T)
+        l_feature_mat = np.matmul(feature_mat, r_mat)
+        new_data.append(l_feature_mat)
+    q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
+    if type == 'type' or type == 'subject':
+        q_feature_mat = np.matmul(q_feature_mat, feature_type_mat.T)
+    l_q_feature_mat = np.matmul(q_feature_mat, r_mat)
+    result = []
+    if info[2] == 'cm':
+        for ind, d in enumerate(new_data):
+            sim_score = np.sum(np.abs(d - l_q_feature_mat))
             result.append([labels[ind], sim_score])
         print(getSubject(result, True))
-        result = sorted(result, key=lambda x: x[1])[:12]
-        i = 0
-        for ele in result:
-            i += 1
-            print(i, ele[0], "Distance score:", ele[1])
-    else:
-        l_features = load_json(args.latent_path)
-        # with open(args.latent_path, 'rb') as f:
-        centroids = l_features[2]
-        labels = data[0]
-        feature_type_mat = []
-        if type == 'type' or type == 'subject':
-            feature_type_mat = np.array(l_features[3])
-        data_cluster_index, data_in_latent_space, data_cluster_dist = [], [], []
-        for d in data[1]:
-            feature_mat = model.compute_features(d)
-            if type == 'type' or type == 'subject':
-                feature_mat = np.matmul(feature_mat, feature_type_mat.T)
-            min_dist_arr = np.sum((centroids - feature_mat) ** 2, axis=1)
-            # min_dist_ctr = np.argmin(min_dist_arr)
-            # data_cluster_index.append(min_dist_ctr)
-            # data_cluster_dist.append(np.min(min_dist_arr))
-            data_in_latent_space.append(min_dist_arr)
-        # data_cluster_index = np.array(data_cluster_index)
-        # data_in_latent_space = np.zeros((data_cluster_index.size, centroids.shape[0]))
-        # data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = data_cluster_dist
-
-        query_features = model.compute_features(imageLoader.load_image(args.image_path))
-        min_dist_arr = np.sum((centroids - query_features) ** 2, axis=1)
-        # min_dist_ctr = np.argmin(min_dist_arr)
-        # query_in_latent_space = np.zeros(centroids.shape[0])
-        # query_in_latent_space[min_dist_ctr] = np.min(min_dist_arr)
-        query_in_latent_space = min_dist_arr
-
-        result = []
-        for ind, d in enumerate(data_in_latent_space):
-            sim_score = np.sum(np.linalg.norm(d - query_in_latent_space))
+    elif info[2] == 'elbp':
+        for ind, d in enumerate(new_data):
+            sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
             result.append([labels[ind], sim_score])
+        print(getSubject(result, False))
+    else:
+        for ind, d in enumerate(new_data):
+            sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+            result.append([labels[ind], sim_score])
+        print(getSubject(result, False))
+elif(tech=='lda'):
+    l_features = load_json(args.latent_path)
+    lda = LDA(file_name=file_name)
+    labels = data[0]
+    # original_metrics = model.compute_features_for_images(data[1])
+    original_metrics = data[1]
+    if type == 'type' or type == 'subject':
+        transform_matrix = np.array(l_features[2]).T
+        original_metrics = np.matmul(original_metrics, transform_matrix)
+    else:
+        original_metrics = lda_helper.transform_cm_for_lda(original_metrics)
+    original_metrics = lda.transform_data(original_metrics)
+    # subjects, original_metrics = group_by_subject(labels, original_metrics)
 
-        result = sorted(result, key=lambda x: x[1])[:args.k]
-        i = 0
-        for ele in result:
-            i += 1
-            print(i, ele[0], "Distance score:", ele[1])
-            imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
+    q_feature_mat = model.compute_features(imageLoader.load_image(args.image_path))
+    q_feature_mat = q_feature_mat.reshape([1, q_feature_mat.shape[0]])
+    if type == 'type' or type == 'subject':
+        q_feature_mat = np.matmul(q_feature_mat, transform_matrix)
+    else:
+        q_feature_mat = lda_helper.transform_cm_for_lda(q_feature_mat)
+
+    q_feature_mat = lda.transform_data(q_feature_mat)
+    result = []
+    for ind, d in enumerate(original_metrics):
+        distance_score = np.linalg.norm(d - q_feature_mat)
+        result.append([labels[ind], distance_score])
+    print(getSubject(result, True))
+    result = sorted(result, key=lambda x: x[1])[:12]
+    # print(result[0][0])
+    i = 0
+    for ele in result:
+        i += 1
+        print(i, ele[0], "Distance score:", ele[1])
+else:
+    l_features = load_json(args.latent_path)
+    # with open(args.latent_path, 'rb') as f:
+    centroids = l_features[2]
+    labels = data[0]
+    feature_type_mat = []
+    if type == 'type' or type == 'subject':
+        feature_type_mat = np.array(l_features[3])
+    data_cluster_index, data_in_latent_space, data_cluster_dist = [], [], []
+    for d in data[1]:
+        feature_mat = model.compute_features(d)
+        if type == 'type' or type == 'subject':
+            feature_mat = np.matmul(feature_mat, feature_type_mat.T)
+        min_dist_arr = np.sum((centroids - feature_mat) ** 2, axis=1)
+        # min_dist_ctr = np.argmin(min_dist_arr)
+        # data_cluster_index.append(min_dist_ctr)
+        # data_cluster_dist.append(np.min(min_dist_arr))
+        data_in_latent_space.append(min_dist_arr)
+    # data_cluster_index = np.array(data_cluster_index)
+    # data_in_latent_space = np.zeros((data_cluster_index.size, centroids.shape[0]))
+    # data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = data_cluster_dist
+
+    query_features = model.compute_features(imageLoader.load_image(args.image_path))
+    min_dist_arr = np.sum((centroids - query_features) ** 2, axis=1)
+    # min_dist_ctr = np.argmin(min_dist_arr)
+    # query_in_latent_space = np.zeros(centroids.shape[0])
+    # query_in_latent_space[min_dist_ctr] = np.min(min_dist_arr)
+    query_in_latent_space = min_dist_arr
+
+    result = []
+    for ind, d in enumerate(data_in_latent_space):
+        sim_score = np.sum(np.linalg.norm(d - query_in_latent_space))
+        result.append([labels[ind], sim_score])
+
+    result = sorted(result, key=lambda x: x[1])[:args.k]
+    i = 0
+    for ele in result:
+        i += 1
+        print(i, ele[0], "Distance score:", ele[1])
+        imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
