@@ -189,9 +189,5 @@ if data is not None:
             sim_score = np.sum(np.linalg.norm(d - query_in_latent_space))
             result.append([labels[ind], sim_score])
 
-        result = sorted(result, key=lambda x: x[1])[:args.k]
-        i = 0
-        for ele in result:
-            i += 1
-            print(i, ele[0], "Distance score:", ele[1])
-            imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
+        result = sorted(result, key=lambda x: x[1])[:min(100, len(result))]
+        print(getSubject(result))
