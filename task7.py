@@ -40,8 +40,10 @@ def getSubject(result, isDist):
     for res in result:
         label = res[0].split("-")[2]
         if label not in scores:
-            scores[label] = 0
-        scores[label] += res[1]
+            scores[label] = []
+        scores[label].append(res[1])
+    for x in scores.keys():
+        scores[x] = np.mean(np.array(scores[x]))
     ans = ""
     maxScore = 0
     for x, y in scores.items():
@@ -49,7 +51,11 @@ def getSubject(result, isDist):
             maxScore = y
             ans = x
     return ans
-
+	
+# def mapResult(x):
+#     if x[1] != 0:
+#         x[1] = 1/x[1]
+#     return x
 
 data = imageLoader.load_images_from_folder(args.folder_path)
 if data is not None:
@@ -81,16 +87,22 @@ if data is not None:
             for ind, d in enumerate(new_data):
                 sim_score = np.sum(np.abs(d - l_q_feature_mat))
                 result.append([labels[ind], sim_score])
+            result.sort(key = lambda x:x[1])
+            result = result[:min(len(result),100)]
             print(getSubject(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key = lambda x:x[1], reverse=True)
+            result = result[:min(len(result),100)]
             print(getSubject(result, False))
         else:
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key = lambda x:x[1], reverse=True)
+            result = result[:min(len(result),100)]
             print(getSubject(result, False))
     elif (tech == 'svd'):
 
@@ -114,17 +126,32 @@ if data is not None:
             for ind, d in enumerate(new_data):
                 sim_score = np.sum(np.abs(d - l_q_feature_mat))
                 result.append([labels[ind], sim_score])
+            result.sort(key = lambda x:x[1])
+            result = result[:min(len(result),100)]
+            # result = list(map(mapResult,result))
+            # # print(list(result))
+            # maxSim = 0
+            # for x in result:
+            #     maxSim = max(maxSim,x[1])
+            # for x in result:
+            #     if x[1]==0:
+            #         x[1] = maxSim+1
             print(getSubject(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key = lambda x:x[1], reverse=True)
+            result = result[:min(len(result),100)]
             print(getSubject(result, False))
         else:
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key = lambda x:x[1], reverse=True)
+            result = result[:min(len(result),100)]
             print(getSubject(result, False))
+        
     elif(tech=='lda'):
         l_features = load_json(args.latent_path)
         lda = LDA(file_name=file_name)
