@@ -34,6 +34,7 @@ parser.add_argument(
     type=int,
     required=True,
 )
+
 parser.add_argument(
     "-q",
     "--image_path",

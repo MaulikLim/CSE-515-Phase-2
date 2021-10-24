@@ -113,8 +113,7 @@ if data is not None:
         pca = PCA(args.k)
         latent_data = [labels, pca.compute_semantics(
             sub_mat), sub_mat.tolist(), feature_sub_mat.tolist()]
-        print_semantics_sub(labels, np.matmul(
-            np.array(latent_data[1][0]), np.array(latent_data[1][1])))
+        print_semantics_sub(labels, np.array(latent_data[1][0]))
         save_features_to_json(args.folder_path, latent_data, file_name)
     elif args.tech == 'svd':
         svd = SVD(args.k)
