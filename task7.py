@@ -51,7 +51,8 @@ def getSubject(result, isDist):
             maxScore = y
             ans = x
     return ans
-	
+
+
 # def mapResult(x):
 #     if x[1] != 0:
 #         x[1] = 1/x[1]
@@ -87,22 +88,22 @@ if data is not None:
             for ind, d in enumerate(new_data):
                 sim_score = np.sum(np.abs(d - l_q_feature_mat))
                 result.append([labels[ind], sim_score])
-            result.sort(key = lambda x:x[1])
-            result = result[:min(len(result),100)]
+            result.sort(key=lambda x: x[1])
+            result = result[:min(len(result), 100)]
             print(getSubject(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key = lambda x:x[1], reverse=True)
-            result = result[:min(len(result),100)]
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getSubject(result, False))
         else:
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key = lambda x:x[1], reverse=True)
-            result = result[:min(len(result),100)]
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getSubject(result, False))
     elif (tech == 'svd'):
 
@@ -126,8 +127,8 @@ if data is not None:
             for ind, d in enumerate(new_data):
                 sim_score = np.sum(np.abs(d - l_q_feature_mat))
                 result.append([labels[ind], sim_score])
-            result.sort(key = lambda x:x[1])
-            result = result[:min(len(result),100)]
+            result.sort(key=lambda x: x[1])
+            result = result[:min(len(result), 100)]
             # result = list(map(mapResult,result))
             # # print(list(result))
             # maxSim = 0
@@ -139,20 +140,20 @@ if data is not None:
             print(getSubject(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key = lambda x:x[1], reverse=True)
-            result = result[:min(len(result),100)]
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getSubject(result, False))
         else:
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key = lambda x:x[1], reverse=True)
-            result = result[:min(len(result),100)]
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getSubject(result, False))
-        
-    elif(tech=='lda'):
+
+    elif (tech == 'lda'):
         l_features = load_json(args.latent_path)
         lda = LDA(file_name=file_name)
         labels = data[0]
@@ -205,6 +206,8 @@ if data is not None:
         # data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = data_cluster_dist
 
         query_features = model.compute_features(imageLoader.load_image(args.image_path))
+        if type == 'type' or type == 'subject':
+            query_features = np.matmul(query_features, feature_type_mat.T)
         min_dist_arr = np.sum((centroids - query_features) ** 2, axis=1)
         # min_dist_ctr = np.argmin(min_dist_arr)
         # query_in_latent_space = np.zeros(centroids.shape[0])
@@ -216,9 +219,5 @@ if data is not None:
             sim_score = np.sum(np.linalg.norm(d - query_in_latent_space))
             result.append([labels[ind], sim_score])
 
-        result = sorted(result, key=lambda x: x[1])[:args.k]
-        i = 0
-        for ele in result:
-            i += 1
-            print(i, ele[0], "Distance score:", ele[1])
-            imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
+        result = sorted(result, key=lambda x: x[1])[:min(100, len(result))]
+        print(getSubject(result, isDist=True))
