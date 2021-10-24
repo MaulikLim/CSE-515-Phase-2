@@ -141,7 +141,7 @@ if data is not None:
             imageLoader.show_image(os.path.join(args.folder_path, ele[0]))
     elif tech == 'lda':
         l_features = load_json(args.latent_path)
-        lda = LDA(file_name=file_name)
+        lda = LDA(file_name=args.folder_path + '/' + file_name)
         labels = data[0]
         # original_metrics = model.compute_features_for_images(data[1])
         original_metrics = data[1]
