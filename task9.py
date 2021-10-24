@@ -85,11 +85,11 @@ def pageRank(linkMatrix, d, seedmatrix) :
     r = 100 * np.ones((n,1)) / n # Sets up this vector (n entries of 1/n × 100 each)
     #print("r shape = ",r.shape)
     last = r
-    r = d*np.matmul(linkMatrix,r) + (1-d)/n * seedmatrix#M @ r
+    r = d*np.matmul(linkMatrix,r) + (1-d)/3 * seedmatrix#M @ r
     #print("r shape after calculation= ",r.shape)
     while la.norm(last - r) > 0.01 :
         last = r
-        r = d*np.matmul(linkMatrix,last) + (1-d)/n * seedmatrix
+        r = d*np.matmul(linkMatrix,last) + (1-d)/3 * seedmatrix
     return r
 def task9(subject_subject_Matrix,subjectIds,m):
     transition_matrix = generate_transitionMatrix(subject_subject_Matrix)
