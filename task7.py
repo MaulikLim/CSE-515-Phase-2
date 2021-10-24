@@ -218,4 +218,4 @@ if data is not None:
             result.append([labels[ind], sim_score])
 
         result = sorted(result, key=lambda x: x[1])[:min(100, len(result))]
-        print(getSubject(result))
+        print(getSubject(result, isDist=True))
