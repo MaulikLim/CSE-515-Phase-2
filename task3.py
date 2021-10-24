@@ -84,10 +84,11 @@ def create_type_type(metrics, labels):
         type_features.append(type_weight / count)
         index += 1
     type_features = np.array(type_features)
-    type_type = np.zeros((len(types),len(types)))
+    type_type = np.zeros((len(types), len(types)))
     for i in range(type_features.shape[0]):
-        for j in range(i,type_features.shape[0]):
-            type_type[i][j] = type_type[j][i] = intersection_similarity_between_features(type_features[i],type_features[j])
+        for j in range(i, type_features.shape[0]):
+            type_type[i][j] = type_type[j][i] = intersection_similarity_between_features(type_features[i],
+                                                                                         type_features[j])
     # type_type = np.matmul(type_features, type_features.T)
     return [types, type_type, type_features]
 
