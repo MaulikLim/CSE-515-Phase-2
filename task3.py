@@ -1,5 +1,6 @@
 from featureGenerator import save_features_to_json
 import imageLoader
+import featureLoader
 import modelFactory
 import argparse
 import json
@@ -93,12 +94,12 @@ def create_type_type(metrics, labels):
     return [types, type_type, type_features]
 
 
-data = imageLoader.load_images_from_folder(args.folder_path)
+data = featureLoader.load_features_for_model(args.folder_path, args.feature_model)
 if data is not None:
-    model = modelFactory.get_model(args.feature_model)
-    images = data[1]
+    # model = modelFactory.get_model(args.feature_model)
+    features = data[1]
     labels = data[0]
-    features = model.compute_features_for_images(images)
+    # features = model.compute_features_for_images(images)
     type_mat = create_type_type(features, labels)
     labels = type_mat[0]
     feature_type_mat = type_mat[2]
