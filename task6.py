@@ -83,16 +83,22 @@ if data is not None:
             for ind, d in enumerate(new_data):
                 sim_score = np.sum(np.abs(d - l_q_feature_mat))
                 result.append([labels[ind], sim_score])
+            result.sort(key=lambda x: x[1])
+            result = result[:min(len(result), 100)]
             print(getType(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getType(result, False))
         else:
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getType(result, False))
     elif tech == 'svd':
         labels = data[0]
@@ -114,16 +120,22 @@ if data is not None:
             for ind, d in enumerate(new_data):
                 sim_score = np.sum(np.abs(d - l_q_feature_mat))
                 result.append([labels[ind], sim_score])
+            result.sort(key=lambda x: x[1])
+            result = result[:min(len(result), 100)]
             print(getType(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getType(result, False))
         else:
             for ind, d in enumerate(new_data):
                 sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
                 result.append([labels[ind], sim_score])
+            result.sort(key=lambda x: x[1], reverse=True)
+            result = result[:min(len(result), 100)]
             print(getType(result, False))
     elif tech == 'lda':
         l_features = load_json(args.latent_path)
@@ -194,6 +206,8 @@ if data is not None:
             sim_score = np.sum(np.linalg.norm(d - query_in_latent_space))
             result.append([labels[ind], sim_score])
 
+        result.sort(key=lambda x: x[1])
+        result = result[:min(len(result), 100)]
         # result = sorted(result, key=lambda x: x[1])
         print(getType(result, True))
         # i = 0
