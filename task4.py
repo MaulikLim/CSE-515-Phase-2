@@ -51,7 +51,7 @@ def create_sub_sub(features, labels):
         lab = labels[i].split("-")[2]
         if lab not in labs:
             labs.append(lab)
-            res_labs.append(labels[i])
+            res_labs.append(lab)
             res.append(features[i])
         else:
             ind = labs.index(lab)
