@@ -190,6 +190,8 @@ if data is not None:
         # data_in_latent_space[np.arange(data_cluster_index.size), data_cluster_index] = data_cluster_dist
 
         query_features = model.compute_features(imageLoader.load_image(args.image_path))
+        if type == 'type' or type == 'subject':
+            query_features = np.matmul(query_features, feature_type_mat.T)
         min_dist_arr = np.sum((centroids - query_features) ** 2, axis=1)
         # min_dist_ctr = np.argmin(min_dist_arr)
         # query_in_latent_space = np.zeros(centroids.shape[0])
