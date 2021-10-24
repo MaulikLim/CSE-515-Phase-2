@@ -6,12 +6,13 @@ import json
 import os
 import numpy as np
 import datetime
+import featureLoader
 
 from tech.PCA import PCA
 from tech.KMeans import KMeans
 from tech.SVD import SVD
 from tech.LDA import LDA
-from utilities import print_semantics_sub
+from utilities import print_semantics_sub, intersection_similarity_between_features
 
 parser = argparse.ArgumentParser(description="Task 4")
 parser.add_argument(
@@ -82,16 +83,21 @@ def create_sub_sub(metrics, labels):
         subject_features.append(subject_weight/count)
         index += 1
     subject_features = np.array(subject_features)
-    sub_sub = np.matmul(subject_features, subject_features.T)
+    # sub_sub = np.matmul(subject_features, subject_features.T)
+    sub_sub = np.zeros((len(subjects),len(subjects)))
+    for i in range(subject_features.shape[0]):
+        for j in range(i,subject_features.shape[0]):
+            sub_sub[i][j] = sub_sub[j][i] = intersection_similarity_between_features(subject_features[i],subject_features[j])
+    print(sub_sub.shape)
     return [subjects, sub_sub, subject_features]
 
 
-data = imageLoader.load_images_from_folder(args.folder_path)
+data = featureLoader.load_features_for_model(args.folder_path, args.feature_model)
 if data is not None:
     model = modelFactory.get_model(args.feature_model)
-    images = data[1]
+    # images = data[1]
     labels = data[0]
-    features = model.compute_features_for_images(images)
+    features = data[1]
     sub_mat = create_sub_sub(features, labels)
     labels = sub_mat[0]
     feature_sub_mat = sub_mat[2]
