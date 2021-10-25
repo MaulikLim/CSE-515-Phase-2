@@ -82,14 +82,14 @@ if data is not None:
             result = sorted(result, key=lambda x: x[1])[:args.k]
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result = sorted(result, key=lambda x: x[1])[::-1][:args.k]
+            result = sorted(result, key=lambda x: x[1])[:args.k]
         else:
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result = sorted(result, key=lambda x: x[1])[::-1][:args.k]    
+            result = sorted(result, key=lambda x: x[1])[:args.k]    
         i = 0
         for ele in result:
             i += 1
@@ -125,14 +125,20 @@ if data is not None:
             result = sorted(result, key=lambda x: x[1])[:args.k]
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+            # for ind in range(len(new_data)):
+                # print(d)
+                # print(l_q_feature_mat)
+                # break
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
+                # print(sim_score, end=", ")
                 result.append([labels[ind], sim_score])
-            result = sorted(result, key=lambda x: x[1])[::-1][:args.k]
+            result = sorted(result, key=lambda x: x[1])[:args.k]
+            print(result)
         else:
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d , l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result = sorted(result, key=lambda x: x[1])[::-1][:args.k]
+            result = sorted(result, key=lambda x: x[1])[:args.k]
             
         i = 0
         for ele in result:

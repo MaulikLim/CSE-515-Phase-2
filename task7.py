@@ -93,18 +93,18 @@ if data is not None:
             print(getSubject(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key=lambda x: x[1], reverse=True)
+            result.sort(key=lambda x: x[1])
             result = result[:min(len(result), 100)]
-            print(getSubject(result, False))
+            print(getSubject(result, True))
         else:
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key=lambda x: x[1], reverse=True)
+            result.sort(key=lambda x: x[1])
             result = result[:min(len(result), 100)]
-            print(getSubject(result, False))
+            print(getSubject(result, True))
     elif (tech == 'svd'):
         labels = data[0]
         r_mat = np.array(l_features[1][2]).transpose()
@@ -139,18 +139,18 @@ if data is not None:
             print(getSubject(result, True))
         elif info[2] == 'elbp':
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key=lambda x: x[1], reverse=True)
+            result.sort(key=lambda x: x[1])
             result = result[:min(len(result), 100)]
-            print(getSubject(result, False))
+            print(getSubject(result, True))
         else:
             for ind, d in enumerate(new_data):
-                sim_score = intersection_similarity_between_features(d, l_q_feature_mat)
+                sim_score = np.linalg.norm(d - l_q_feature_mat)
                 result.append([labels[ind], sim_score])
-            result.sort(key=lambda x: x[1], reverse=True)
+            result.sort(key=lambda x: x[1])
             result = result[:min(len(result), 100)]
-            print(getSubject(result, False))
+            print(getSubject(result, True))
 
     elif (tech == 'lda'):
         l_features = load_json(args.latent_path)
