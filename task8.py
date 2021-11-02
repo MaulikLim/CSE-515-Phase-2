@@ -94,8 +94,10 @@ def task8(temp, n, m):
     for i in range(rows):
         topK[i] = np.sum(s[:][i]) / rows
     indices = np.flip(np.argsort(topK, axis=0))
+    # print(labels)
+    # print(indices[:m])
     for ind in indices[:m]:
-        print(int(labels[ind][0].split('.')[0].split('-')[2]))
+        print(int(labels[ind][0]))
 
 
 task8(sub_sub_mat, n, m)
